@@ -10,7 +10,10 @@ DATE_FMT = '\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])'
 def create_folder(path_name, is_file=False):
     """
     Make folder as well as all parent folders if not exists
-    :param path_name: full path name
+
+    Args:
+        path_name: full path name
+        is_file: whether input is name of file
     """
     assert isinstance(path_name, str)
     path_sep = path_name.replace('\\', '/').split('/')
@@ -22,12 +25,17 @@ def create_folder(path_name, is_file=False):
 def all_files(path_name, keyword='', ext='', full_path=True, has_date=False, date_fmt=DATE_FMT):
     """
     Search all files with criteria
-    :param path_name: full path name
-    :param keyword: keyword to search
-    :param ext: file extensions, split by ','
-    :param full_path: whether return full path (default True)
-    :param has_date: whether has date in file name (default False)
-    :return: all file names
+
+    Args:
+        path_name: full path name
+        keyword: keyword to search
+        ext: file extensions, split by ','
+        full_path: whether return full path (default True)
+        has_date: whether has date in file name (default False)
+        date_fmt: date format to check for has_date parameter
+
+    Returns:
+        list: all file names fulfilled criteria
     """
     if not os.path.exists(path=path_name): return []
 
@@ -56,10 +64,15 @@ def all_files(path_name, keyword='', ext='', full_path=True, has_date=False, dat
 def all_folders(path_name, keyword='', has_date=False, date_fmt=DATE_FMT):
     """
     Search all folders with criteria
-    :param path_name: full path name
-    :param keyword: keyword to search
-    :param has_date: has date in folder name (default False)
-    :return: all folder names
+
+    Args:
+        path_name: full path name
+        keyword: keyword to search
+        has_date: whether has date in file name (default False)
+        date_fmt: date format to check for has_date parameter
+
+    Returns:
+        list: all folder names fulfilled criteria
     """
     if not os.path.exists(path=path_name): return []
 
@@ -89,9 +102,16 @@ def all_folders(path_name, keyword='', has_date=False, date_fmt=DATE_FMT):
 
 def latest_file(path_name, keyword='', ext='', debug=False):
     """
-    Search latest modified file in folder
-    :param debug: print out msg if not found
-    :return: latest file name
+    Latest modified file in folder
+
+    Args:
+        path_name: full path name
+        keyword: keyword to search
+        ext: file extension
+        debug: print out debug message if not found
+
+    Returns:
+        str: latest file name
     """
     files = all_files(path_name=path_name, keyword=keyword, ext=ext, full_path=True)
 
