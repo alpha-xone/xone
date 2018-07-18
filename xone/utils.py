@@ -123,6 +123,13 @@ def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic'):
 
     Returns:
         pd.Series: fitted curve
+
+    Examples:
+        >>> x = pd.Series([1, 2, 3])
+        >>> y = pd.Series([np.exp(1), np.exp(2), np.exp(3)])
+        >>> r = spline_curve(x=x, y=y, step=.5, val_min=3, val_max=18).round(2)
+        >>> assert r.index.tolist() == [1., 1.5, 2., 2.5, 3.]
+        >>> assert r.round(2).tolist() == [3., 4.05, 7.39, 12.73, 18.]
     """
     if isinstance(y, pd.DataFrame):
         return pd.DataFrame(OrderedDict([(col, spline_curve(
