@@ -1,2 +1,2 @@
 # xone
-Frequently used functions for python time series analysis
+Frequently used functions for financial data analysis
