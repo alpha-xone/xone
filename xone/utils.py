@@ -110,7 +110,7 @@ def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic'):
 
     Args:
         x: x-values
-        y: y-value
+        y: y-values
         step: step size for interpolation
         val_min: minimum value of result
         val_max: maximum value of result
