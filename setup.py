@@ -20,7 +20,7 @@ def parse_version(package):
     with open(init_file, 'r', encoding='utf-8') as f:
         for line in f.readlines():
             if '__version__' in line:
-                return line.split('=')[1].strip()
+                return line.split('=')[1].strip().replace("'", '')
     return ''
 
 
@@ -47,7 +47,8 @@ def parse_requirements(file_name):
     require_path = join(dirname(__file__), file_name)
     if exists(require_path):
         with open(require_path, 'r') as file:
-            return [requirements.parse(line).name for line in file.readlines() if line != '']
+            requires = list(requirements.parse(file))
+            return [r.name for r in requires]
     return []
 
 
@@ -74,9 +75,9 @@ if __name__ == '__main__':
         # package_data=dict(sample=[]),
         # data_files=[('my_data', ['data/data_file'])],
         # entry_points=dict(),
-        classifiers=(
-            'Programming Language :: Python :: 3',
-            'License :: OSI Approved :: Apache Software License',
-            'Operating System :: OS Independent',
-        ),
+        classifiers=[
+            "Programming Language :: Python :: 3",
+            "License :: OSI Approved :: Apache Software License",
+            "Operating System :: OS Independent",
+        ],
     )
