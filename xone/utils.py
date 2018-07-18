@@ -1,6 +1,8 @@
+import numpy as np
 import pandas as pd
 
-from collections import Iterable
+from collections import Iterable, OrderedDict
+from scipy.interpolate import interp1d
 
 
 def tolist(iterable):
@@ -100,6 +102,37 @@ def _to_gen(iterable):
         if isinstance(elm, Iterable) and not isinstance(elm, (str, bytes)):
             yield from flatten(elm)
         else: yield elm
+
+
+def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic'):
+    """
+    Fit spline curve for given x, y values
+
+    Args:
+        x: x-values
+        y: y-value
+        step: step size for interpolation
+        val_min: minimum value of result
+        val_max: maximum value of result
+        kind: for scipy.interpolate.interp1d
+        Specifies the kind of interpolation as a string (‘linear’, ‘nearest’, ‘zero’, ‘slinear’,
+        ‘quadratic’, ‘cubic’, ‘previous’, ‘next’, where ‘zero’, ‘slinear’, ‘quadratic’ and ‘cubic’
+        refer to a spline interpolation of zeroth, first, second or third order; ‘previous’ and
+        ‘next’ simply return the previous or next value of the point) or as an integer specifying
+        the order of the spline interpolator to use. Default is ‘linear’.
+
+    Returns:
+        pd.Series: fitted curve
+    """
+    if isinstance(y, pd.DataFrame):
+        return pd.DataFrame(OrderedDict([(col, spline_curve(
+            x, y.loc[:, col], step=step, val_min=val_min, val_max=val_max, kind=kind
+        )) for col in y.columns]))
+    cubic = interp1d(x, y, kind=kind)
+    new_x = np.arange(x.min(), x.max() + step / 2., step=step)
+    return pd.Series(
+        new_x, index=new_x, name=y.name if hasattr(y, 'name') else None
+    ).apply(cubic).clip(val_min, val_max)
 
 
 if __name__ == '__main__':

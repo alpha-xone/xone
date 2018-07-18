@@ -4,4 +4,6 @@ __submodules__ = [
     'utils',
     'calendar',
     'files',
+    'procs',
+    'plots',
 ]
