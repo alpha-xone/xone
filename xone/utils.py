@@ -154,7 +154,7 @@ def _to_gen(iterable):
         else: yield elm
 
 
-def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic'):
+def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic', **kwargs):
     """
     Fit spline curve for given x, y values
 
@@ -170,6 +170,7 @@ def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic'):
         refer to a spline interpolation of zeroth, first, second or third order; ‘previous’ and
         ‘next’ simply return the previous or next value of the point) or as an integer specifying
         the order of the spline interpolator to use. Default is ‘linear’.
+        **kwargs: additional parameters for interp1d
 
     Returns:
         pd.Series: fitted curve
@@ -177,7 +178,9 @@ def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic'):
     Examples:
         >>> x = pd.Series([1, 2, 3])
         >>> y = pd.Series([np.exp(1), np.exp(2), np.exp(3)])
-        >>> r = spline_curve(x=x, y=y, step=.5, val_min=3, val_max=18).round(2)
+        >>> r = spline_curve(
+        >>>     x=x, y=y, step=.5, val_min=3, val_max=18, fill_value='extrapolate'
+        >>> ).round(2)
         >>> assert r.index.tolist() == [1., 1.5, 2., 2.5, 3.]
         >>> assert r.round(2).tolist() == [3., 4.05, 7.39, 12.73, 18.]
     """
@@ -188,11 +191,11 @@ def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic'):
         return pd.DataFrame(OrderedDict([(col, spline_curve(
             x, y.loc[:, col], step=step, val_min=val_min, val_max=val_max, kind=kind
         )) for col in y.columns]))
-    cubic = interp1d(x, y, kind=kind)
+    fitted_curve = interp1d(x, y, kind=kind, **kwargs)
     new_x = np.arange(x.min(), x.max() + step / 2., step=step)
     return pd.Series(
         new_x, index=new_x, name=y.name if hasattr(y, 'name') else None
-    ).apply(cubic).clip(val_min, val_max)
+    ).apply(fitted_curve).clip(val_min, val_max)
 
 
 if __name__ == '__main__':
