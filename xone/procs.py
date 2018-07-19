@@ -74,11 +74,9 @@ def saturate_kwargs(keys, **kwargs):
 
 
 if __name__ == '__main__':
-
-    import time
-
-    def test_func(num, sh):
-        time.sleep(0.05)
-        if sh: assert(num >= 0)
-
-    run(func=test_func, keys='num', num=range(100), sh=False)
+    """
+    CommandLine:
+        python -m xone.procs all
+    """
+    import xdoctest as xdoc
+    xdoc.doctest_module()

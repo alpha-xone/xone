@@ -12,5 +12,4 @@ if __name__ == '__main__':
         '--cov=' + package_name,
     ]
     pytest_args = pytest_args + sys.argv[1:]
-    print(pytest_args)
     pytest.main(args=pytest_args)

@@ -128,3 +128,12 @@ def latest_file(path_name, keyword='', ext='', debug=False):
 def file_modified_time(file_name):
 
     return pd.to_datetime(time.ctime(os.path.getmtime(filename=file_name)))
+
+
+if __name__ == '__main__':
+    """
+    CommandLine:
+        python -m xone.files all
+    """
+    import xdoctest as xdoc
+    xdoc.doctest_module()
