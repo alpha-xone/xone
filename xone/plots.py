@@ -1,5 +1,3 @@
-import matplotlib.pyplot as plt
-
 from xone import utils
 
 
@@ -17,7 +15,16 @@ def plot_multi(data, cols=None, spacing=.06, color_map=None, plot_kw=None, **kwa
 
     Returns:
         ax for plot
+
+    Examples:
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>>
+        >>> idx = range(5)
+        >>> data = pd.DataFrame(dict(a=np.exp(idx), b=idx), index=idx)
+        >>> plot_multi(data=data, cols=['a', 'b'], plot_kw=[dict(style='.-'), dict()])
     """
+    import matplotlib.pyplot as plt
     from pandas import plotting
 
     if cols is None: cols = data.columns
@@ -90,7 +97,17 @@ def plot_h(data, cols, wspace=.1, plot_kw=None, **kwargs):
 
     Returns:
         axes for plots
+
+    Examples:
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>>
+        >>> idx = range(5)
+        >>> data = pd.DataFrame(dict(a=np.exp(idx), b=idx), index=idx)
+        >>> plot_h(data=data, cols=['a', 'b'], wspace=.2, plot_kw=[dict(style='.-'), dict()])
     """
+    import matplotlib.pyplot as plt
+
     if plot_kw is None: plot_kw = [dict()] * len(cols)
 
     fig, axes = plt.subplots(nrows=1, ncols=len(cols), **kwargs)
