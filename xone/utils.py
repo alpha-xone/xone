@@ -1,9 +1,6 @@
 import numpy as np
 import pandas as pd
 
-from collections import Iterable, OrderedDict
-from scipy.interpolate import interp1d
-
 
 def tolist(iterable):
     """
@@ -149,6 +146,8 @@ def _to_gen(iterable):
     """
     Recursively iterate lists and tuples
     """
+    from collections import Iterable
+
     for elm in iterable:
         if isinstance(elm, Iterable) and not isinstance(elm, (str, bytes)):
             yield from flatten(elm)
@@ -182,6 +181,9 @@ def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic'):
         >>> assert r.index.tolist() == [1., 1.5, 2., 2.5, 3.]
         >>> assert r.round(2).tolist() == [3., 4.05, 7.39, 12.73, 18.]
     """
+    from scipy.interpolate import interp1d
+    from collections import OrderedDict
+
     if isinstance(y, pd.DataFrame):
         return pd.DataFrame(OrderedDict([(col, spline_curve(
             x, y.loc[:, col], step=step, val_min=val_min, val_max=val_max, kind=kind
