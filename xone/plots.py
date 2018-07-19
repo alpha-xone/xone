@@ -105,10 +105,7 @@ def plot_h(data, cols, wspace=.1, plot_kw=None, **kwargs):
         >>>
         >>> idx = range(5)
         >>> data = pd.DataFrame(dict(a=np.exp(idx), b=idx), index=idx)
-        >>> plot_h(
-        >>>     data=data, cols=['a', 'b'], wspace=.2,
-        >>>     plot_kw=[dict(style='.-'), dict()]
-        >>> )
+        >>> plot_h(data=data, cols=['a', 'b'], wspace=.2, plot_kw=[dict(style='.-'), dict()])
     """
     if plot_kw is None: plot_kw = [dict()] * len(cols)
 

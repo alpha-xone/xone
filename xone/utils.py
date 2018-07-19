@@ -138,11 +138,11 @@ def flatten(iterable, maps=None, unique=False):
         return [maps.get(iterable, iterable)]
 
     else:
-        x = [maps.get(item, item) for item in _to_gen(iterable)]
+        x = [maps.get(item, item) for item in _to_gen_(iterable)]
         return list(set(x)) if unique else x
 
 
-def _to_gen(iterable):
+def _to_gen_(iterable):
     """
     Recursively iterate lists and tuples
     """

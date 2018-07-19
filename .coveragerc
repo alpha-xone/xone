@@ -1,0 +1,18 @@
+[run]
+source = xone
+omit =
+    xone/plots.py
+
+[report]
+exclude_lines =
+    if self.debug:
+    pragma: no cover
+    raise NotImplementedError
+    if __name__ == .__main__.:
+
+ignore_errors = True
+
+omit =
+    xone/__main__.py
+    xone/plots.py
+    */setup.py
