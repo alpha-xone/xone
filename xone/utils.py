@@ -22,6 +22,57 @@ def tolist(iterable):
     return pd.Series(iterable).drop_duplicates().tolist()
 
 
+def cur_time(typ='date', tz='US/Eastern', trading=True, cal='US'):
+    """
+    Current time
+
+    Args:
+        typ: one of ['date', 'time', 'time_path', 'raw', '']
+        tz: timezone
+        trading: check if current date is trading day
+        cal: trading calendar
+
+    Returns:
+        relevant current time or date
+
+    Examples:
+        >>> cur_time(typ='time', tz='UTC')
+        >>> cur_time(typ='time_path', tz='Asia/Hong_Kong')
+        >>> cur_time(typ='raw', tz='Europe/London')
+    """
+    dt = pd.Timestamp('now', tz=tz)
+
+    if typ == 'date':
+        if trading: return latest_trading(dt=dt, cal=cal).strftime('%Y-%m-%d')
+        else: return dt.strftime('%Y-%m-%d')
+
+    if typ == 'time': return dt.strftime('%Y-%m-%d %H:%M:%S')
+    if typ == 'time_path': return dt.strftime('%Y-%m-%d/%H-%M-%S')
+    if typ == 'raw': return dt
+
+    return latest_trading(dt).date() if trading else dt.date()
+
+
+def latest_trading(dt, cal='US'):
+    """
+    Latest trading day w.r.t given dt
+
+    Args:
+        dt: date of reference
+        cal: trading calendar
+
+    Returns:
+        pd.Timestamp: last trading day
+
+    Examples:
+        >>> assert fmt_dt(latest_trading('2018-12-25')) == '2018-12-24'
+    """
+    from xone import calendar
+
+    dt = pd.Timestamp(dt).date()
+    return calendar.trading_dates(start=dt - pd.Timedelta('10D'), end=dt, calendar=cal)[-1]
+
+
 def fmt_dt(dt, fmt='%Y-%m-%d'):
     """
     Format date string
