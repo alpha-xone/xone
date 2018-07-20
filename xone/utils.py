@@ -40,17 +40,17 @@ def cur_time(typ='date', tz='US/Eastern', trading=True, cal='US'):
     dt = pd.Timestamp('now', tz=tz)
 
     if typ == 'date':
-        if trading: return latest_trading(dt=dt, cal=cal).strftime('%Y-%m-%d')
+        if trading: return trade_day(dt=dt, cal=cal).strftime('%Y-%m-%d')
         else: return dt.strftime('%Y-%m-%d')
 
     if typ == 'time': return dt.strftime('%Y-%m-%d %H:%M:%S')
     if typ == 'time_path': return dt.strftime('%Y-%m-%d/%H-%M-%S')
     if typ == 'raw': return dt
 
-    return latest_trading(dt).date() if trading else dt.date()
+    return trade_day(dt).date() if trading else dt.date()
 
 
-def latest_trading(dt, cal='US'):
+def trade_day(dt, cal='US'):
     """
     Latest trading day w.r.t given dt
 
@@ -62,7 +62,7 @@ def latest_trading(dt, cal='US'):
         pd.Timestamp: last trading day
 
     Examples:
-        >>> assert fmt_dt(latest_trading('2018-12-25')) == '2018-12-24'
+        >>> assert fmt_dt(trade_day('2018-12-25')) == '2018-12-24'
     """
     from xone import calendar
 
