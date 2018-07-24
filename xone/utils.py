@@ -206,7 +206,7 @@ def fstr(fmt, **kwargs):
 
     Args:
         fmt: f-string but in terms of normal string, i.e., '{path}/{file}.parq'
-        **kwargs: variables for f-strings, i.e., path, file = 'xx', 'yy'
+        **kwargs: variables for f-strings, i.e., path, file = '/data', 'daily'
 
     Returns:
         FString object
