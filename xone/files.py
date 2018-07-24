@@ -1,8 +1,11 @@
+import pandas as pd
+
 import os
 import re
 import glob
 import time
-import pandas as pd
+import hashlib
+import json
 
 DATE_FMT = '\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])'
 
@@ -15,6 +18,56 @@ def exists(path):
         path: path or file
     """
     return os.path.exists(path=path)
+
+
+def data_file(file_fmt, info, **kwargs):
+    """
+    Data file name for given infomation
+
+    Args:
+        file_fmt: file format in terms of f-strings
+        info: dict, to be hashed and then pass to f-string using 'hash_key'
+              these info will also be passed to f-strings
+        **kwargs: arguments for f-strings
+
+    Returns:
+        str: data file name
+    """
+    from xone import utils
+
+    if isinstance(info, dict):
+        kwargs['hash_key'] = hashlib.md5(json.dumps(info).encode('utf-8')).hexdigest()
+        kwargs.update(info)
+
+    return utils.fstr(fmt=file_fmt, **kwargs)
+
+
+def save_data(data, file_fmt, append=False, drop_dups=None, info=None, **kwargs):
+    """
+    Save data to file
+
+    Args:
+        data: pd.DataFrame
+        file_fmt: data file format in terms of f-strings
+        append: if append data to existing data
+        drop_dups: list, drop duplicates in columns
+        info: dict, infomation to be hashed and passed to f-strings
+        **kwargs: additional parameters for f-strings
+
+    Examples:
+        >>> data = pd.DataFrame([[1, 2], [3, 4]], columns=['a', 'b'])
+        >>> save_data(data, '{ROOT}/daily/{typ}.parq', ROOT='/data', typ='earnings')
+    """
+    from xone import utils
+
+    d_file = utils.fstr(fmt=file_fmt, info=info, **kwargs)
+    if append and exists(d_file):
+        data = pd.DataFrame(pd.concat([pd.read_parquet(d_file), data]))
+        if drop_dups is not None:
+            data.drop_duplicates(subset=utils.tolist(drop_dups), inplace=True)
+
+    data.to_parquet(d_file)
+    return data
 
 
 def create_folder(path_name, is_file=False):
