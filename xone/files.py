@@ -7,6 +7,16 @@ import pandas as pd
 DATE_FMT = '\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])'
 
 
+def exists(path):
+    """
+    Check path or file exists (use os.path.exists)
+
+    Args:
+        path: path or file
+    """
+    return os.path.exists(path=path)
+
+
 def create_folder(path_name, is_file=False):
     """
     Make folder as well as all parent folders if not exists
