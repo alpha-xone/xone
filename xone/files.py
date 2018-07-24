@@ -20,7 +20,7 @@ def exists(path):
     return os.path.exists(path=path)
 
 
-def data_file(file_fmt, info, **kwargs):
+def data_file(file_fmt, info=None, **kwargs):
     """
     Data file name for given infomation
 
