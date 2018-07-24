@@ -60,7 +60,7 @@ def save_data(data, file_fmt, append=False, drop_dups=None, info=None, **kwargs)
     """
     from xone import utils
 
-    d_file = utils.fstr(fmt=file_fmt, info=info, **kwargs)
+    d_file = data_file(file_fmt=file_fmt, info=info, **kwargs)
     if append and exists(d_file):
         data = pd.DataFrame(pd.concat([pd.read_parquet(d_file), data]))
         if drop_dups is not None:
