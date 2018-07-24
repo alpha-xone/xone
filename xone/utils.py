@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 
+import inspect
+
 
 def tolist(iterable):
     """
@@ -196,6 +198,41 @@ def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic', **kwargs
     return pd.Series(
         new_x, index=new_x, name=y.name if hasattr(y, 'name') else None
     ).apply(fitted_curve).clip(val_min, val_max)
+
+
+def fstr(fmt, **kwargs):
+    """
+    Delayed evaluation of f-strings
+
+    Args:
+        fmt: f-string but in terms of normal string, i.e., '{path}/{file}.parq'
+        **kwargs: variables for f-strings, i.e., path, file = 'xx', 'yy'
+
+    Returns:
+        FString object
+
+    References:
+        https://stackoverflow.com/a/42497694/1332656
+        https://stackoverflow.com/a/4014070/1332656
+
+    Examples:
+        >>> fmt = '{file}.parq'
+        >>> file = 'data'
+        >>> assert fstr(fmt, file=file) == 'data.parq'
+    """
+    locals().update(kwargs)
+    return f'{FString(str_fmt=fmt)}'
+
+
+class FString(object):
+
+    def __init__(self, str_fmt):
+        self.str_fmt = str_fmt
+
+    def __str__(self):
+        kwargs = inspect.currentframe().f_back.f_globals.copy()
+        kwargs.update(inspect.currentframe().f_back.f_locals)
+        return self.str_fmt.format(**kwargs)
 
 
 if __name__ == '__main__':
