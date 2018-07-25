@@ -26,7 +26,7 @@ def cache_file(symbol, func, has_date, root, date_type='date'):
     cur_mod = sys.modules[func.__module__]
     data_tz = getattr(cur_mod, 'DATA_TZ') if hasattr(cur_mod, 'DATA_TZ') else 'UTC'
     cur_dt = utils.cur_time(typ=date_type, tz=data_tz, trading=False)
-    if has_date: file_fmt = '{root}/{typ}/{cur_dt}/{symbol}.parq'
+    if has_date: file_fmt = '{root}/{typ}/{symbol}/{cur_dt}.parq'
     else: file_fmt = '{root}/{typ}/{symbol}.parq'
     return data_file(
         file_fmt=file_fmt, root=root, cur_dt=cur_dt, typ=func.__name__, symbol=symbol
