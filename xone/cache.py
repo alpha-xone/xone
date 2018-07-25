@@ -9,13 +9,15 @@ from functools import wraps
 from xone import utils, files, logs
 
 
-def cache_file(func, has_date, root, date_type='date'):
+def cache_file(symbol, func, has_date, root, date_type='date'):
     """
     Data file
 
     Args:
+        symbol: symbol
         func: use function to categorize data
         has_date: contains date in data file
+        root: root path
         date_type: parameters pass to utils.cur_time, [date, time, time_path, ...]
 
     Returns:
@@ -24,9 +26,11 @@ def cache_file(func, has_date, root, date_type='date'):
     cur_mod = sys.modules[func.__module__]
     data_tz = getattr(cur_mod, 'DATA_TZ') if hasattr(cur_mod, 'DATA_TZ') else 'UTC'
     cur_dt = utils.cur_time(typ=date_type, tz=data_tz, trading=False)
-    if has_date: file_fmt = '{root}/{typ}/{cur_dt}.parq'
-    else: file_fmt = '{root}/{typ}.parq'
-    return data_file(file_fmt=file_fmt, root=root, cur_dt=cur_dt, typ=func.__name__)
+    if has_date: file_fmt = '{root}/{typ}/{cur_dt}/{symbol}.parq'
+    else: file_fmt = '{root}/{typ}/{symbol}.parq'
+    return data_file(
+        file_fmt=file_fmt, root=root, cur_dt=cur_dt, typ=func.__name__, symbol=symbol
+    )
 
 
 def update_data(func):
@@ -56,8 +60,10 @@ def update_data(func):
         date_type = kwargs.pop('date_type', 'date')
         save_static = kwargs.pop('save_static', True)
         save_dynamic = kwargs.pop('save_dynamic', True)
-        d_file = cache_file(func=func, has_date=True, root=root_path, date_type=date_type)
-        s_file = cache_file(func=func, has_date=False, root=root_path, date_type=date_type)
+        symbol = kwargs.get('symbol')
+        file_kw = dict(func=func, symbol=symbol, root=root_path, date_type=date_type)
+        d_file = cache_file(has_date=True, **file_kw)
+        s_file = cache_file(has_date=False, **file_kw)
 
         cached = kwargs.pop('cached', False)
         if cached and save_static and files.exists(s_file):
