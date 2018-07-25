@@ -112,7 +112,7 @@ def save_data(data, file_fmt, append=False, drop_dups=None, info=None, **kwargs)
         if drop_dups is not None:
             data.drop_duplicates(subset=utils.tolist(drop_dups), inplace=True)
 
-    data.to_parquet(d_file)
+    if not data.empty: data.to_parquet(d_file)
     return data
 
 
