@@ -21,6 +21,7 @@ Description:
 - Files
 - Calendar
 - Logs
+- Cache
 - Plots
 - Multiprocessing
 - Bloomberg (TODO)
@@ -36,6 +37,9 @@ Calendar
 
 Logs
 ----
+
+Cache
+-----
 
 Plots
 -----

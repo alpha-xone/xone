@@ -1,9 +1,13 @@
+import hashlib
+import json
+
 import pandas as pd
 
 import sys
 import inspect
 from functools import wraps
 from xone import utils, files, logs
+from xone.files import exists
 
 
 def cache_file(func, has_date, root, date_type='date'):
@@ -18,10 +22,12 @@ def cache_file(func, has_date, root, date_type='date'):
     Returns:
         str: date file
     """
-    cur_dt = utils.cur_time(typ=date_type, tz='UTC', trading=False)
+    cur_mod = sys.modules[func.__module__]
+    data_tz = getattr(cur_mod, 'DATA_TZ') if hasattr(cur_mod, 'DATA_TZ') else 'UTC'
+    cur_dt = utils.cur_time(typ=date_type, tz=data_tz, trading=False)
     if has_date: file_fmt = '{root}/{typ}/{cur_dt}.parq'
     else: file_fmt = '{root}/{typ}.parq'
-    return files.data_file(file_fmt=file_fmt, root=root, cur_dt=cur_dt, typ=func.__name__)
+    return data_file(file_fmt=file_fmt, root=root, cur_dt=cur_dt, typ=func.__name__)
 
 
 def update_data(func):
@@ -34,7 +40,6 @@ def update_data(func):
     Returns:
         wrapped function
     """
-
     default = dict([
         (param.name, param.default)
         for param in inspect.signature(func).parameters.values()
@@ -64,15 +69,65 @@ def update_data(func):
 
         if save_static:
             files.create_folder(s_file, is_file=True)
-            files.save_data(data=data, file_fmt=s_file, append=False)
+            save_data(data=data, file_fmt=s_file, append=False)
             logger.info(f'Saved data file to {s_file} ...')
 
         if save_dynamic:
             drop_dups = kwargs.pop('drop_dups', None)
             files.create_folder(d_file, is_file=True)
-            files.save_data(data=data, file_fmt=d_file, append=True, drop_dups=drop_dups)
+            save_data(data=data, file_fmt=d_file, append=True, drop_dups=drop_dups)
             logger.info(f'Saved data file to {d_file} ...')
 
         return data
 
     return wrapper
+
+
+def save_data(data, file_fmt, append=False, drop_dups=None, info=None, **kwargs):
+    """
+    Save data to file
+
+    Args:
+        data: pd.DataFrame
+        file_fmt: data file format in terms of f-strings
+        append: if append data to existing data
+        drop_dups: list, drop duplicates in columns
+        info: dict, infomation to be hashed and passed to f-strings
+        **kwargs: additional parameters for f-strings
+
+    Examples:
+        >>> data = pd.DataFrame([[1, 2], [3, 4]], columns=['a', 'b'])
+        >>> save_data(data, '{ROOT}/daily/{typ}.parq', ROOT='/data', typ='earnings')
+    """
+    from xone import utils
+
+    d_file = data_file(file_fmt=file_fmt, info=info, **kwargs)
+    if append and exists(d_file):
+        data = pd.DataFrame(pd.concat([pd.read_parquet(d_file), data]))
+        if drop_dups is not None:
+            data.drop_duplicates(subset=utils.tolist(drop_dups), inplace=True)
+
+    data.to_parquet(d_file)
+    return data
+
+
+def data_file(file_fmt, info=None, **kwargs):
+    """
+    Data file name for given infomation
+
+    Args:
+        file_fmt: file format in terms of f-strings
+        info: dict, to be hashed and then pass to f-string using 'hash_key'
+              these info will also be passed to f-strings
+        **kwargs: arguments for f-strings
+
+    Returns:
+        str: data file name
+    """
+    from xone import utils
+
+    if isinstance(info, dict):
+        kwargs['hash_key'] = hashlib.md5(json.dumps(info).encode('utf-8')).hexdigest()
+        kwargs.update(info)
+
+    return utils.fstr(fmt=file_fmt, **kwargs)
