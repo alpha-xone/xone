@@ -7,7 +7,6 @@ import sys
 import inspect
 from functools import wraps
 from xone import utils, files, logs
-from xone.files import exists
 
 
 def cache_file(func, has_date, root, date_type='date'):
@@ -102,7 +101,7 @@ def save_data(data, file_fmt, append=False, drop_dups=None, info=None, **kwargs)
     from xone import utils
 
     d_file = data_file(file_fmt=file_fmt, info=info, **kwargs)
-    if append and exists(d_file):
+    if append and files.exists(d_file):
         data = pd.DataFrame(pd.concat([pd.read_parquet(d_file), data]))
         if drop_dups is not None:
             data.drop_duplicates(subset=utils.tolist(drop_dups), inplace=True)
