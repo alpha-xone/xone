@@ -6,7 +6,7 @@ from functools import wraps
 from xone import utils, files, logs
 
 
-def data_file(func, has_date, root, date_type='date'):
+def cache_file(func, has_date, root, date_type='date'):
     """
     Data file
 
@@ -52,8 +52,8 @@ def update_data(func):
         date_type = kwargs.pop('date_type', 'date')
         save_static = kwargs.pop('save_static', True)
         save_dynamic = kwargs.pop('save_dynamic', True)
-        d_file = data_file(func=func, has_date=True, root=root_path, date_type=date_type)
-        s_file = data_file(func=func, has_date=False, root=root_path, date_type=date_type)
+        d_file = cache_file(func=func, has_date=True, root=root_path, date_type=date_type)
+        s_file = cache_file(func=func, has_date=False, root=root_path, date_type=date_type)
 
         cached = kwargs.pop('cached', False)
         if cached and save_static and files.exists(s_file):
