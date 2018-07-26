@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+import sys
 import inspect
 
 
@@ -198,6 +199,12 @@ def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic', **kwargs
     return pd.Series(
         new_x, index=new_x, name=y.name if hasattr(y, 'name') else None
     ).apply(fitted_curve).clip(val_min, val_max)
+
+
+def func_scope(func):
+
+    cur_mod = sys.modules[func.__module__]
+    return f'{cur_mod.__name__}.{func.__name__}'
 
 
 def fstr(fmt, **kwargs):

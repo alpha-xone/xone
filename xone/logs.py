@@ -1,15 +1,17 @@
 import logging
 
+from xone import utils
+
 
 def get_logger(
-        name, log_file='', level=logging.INFO,
+        name_or_func, log_file='', level=logging.INFO,
         fmt='%(asctime)s:%(name)s:%(levelname)s:%(message)s', types='stream'
 ):
     """
     Generate logger
 
     Args:
-        name: logger name
+        name_or_func: logger name or current running function
         log_file: logger file
         level: level of logs - debug, info, error
         fmt: log formats
@@ -19,11 +21,12 @@ def get_logger(
         logger
 
     Examples:
-        >>> get_logger(name='download_data', level='debug', types='stream')
-        >>> get_logger(name='preprocess', log_file='pre.log', types='file|stream')
+        >>> get_logger(name_or_func='download_data', level='debug', types='stream')
+        >>> get_logger(name_or_func='preprocess', log_file='pre.log', types='file|stream')
     """
     if isinstance(level, str): level = getattr(logging, level.upper())
-    logger = logging.getLogger(name=name)
+    log_name = name_or_func if isinstance(name_or_func, str) else utils.func_scope(name_or_func)
+    logger = logging.getLogger(name=log_name)
     logger.setLevel(level=level)
 
     if not len(logger.handlers):
