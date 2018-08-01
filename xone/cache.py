@@ -63,6 +63,7 @@ def update_data(func):
     def wrapper(*args, **kwargs):
 
         default.update(kwargs)
+        kwargs.update(default)
         cur_mod = sys.modules[func.__module__]
         logger = logs.get_logger(name_or_func=f'{cur_mod.__name__}.{func.__name__}', types='stream')
 
