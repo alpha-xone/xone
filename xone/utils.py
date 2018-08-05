@@ -297,6 +297,17 @@ def inst_repr(instance, fmt='str', public_only=True):
     return ''
 
 
+class AttributeDict(dict):
+    """
+    Dot access support for dict attributes
+
+    References:
+        https://stackoverflow.com/a/5021467/1332656
+    """
+    __getattr__ = dict.__getitem__
+    __setattr__ = dict.__setitem__
+
+
 if __name__ == '__main__':
     """
     CommandLine:
