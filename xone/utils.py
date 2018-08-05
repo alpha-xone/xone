@@ -3,6 +3,7 @@ import pandas as pd
 
 import sys
 import inspect
+import json
 
 
 def tolist(iterable):
@@ -240,6 +241,44 @@ class FString(object):
         kwargs = inspect.currentframe().f_back.f_globals.copy()
         kwargs.update(inspect.currentframe().f_back.f_locals)
         return self.str_fmt.format(**kwargs)
+
+
+def to_str(data, fmt='{key}={value}', sep=', '):
+    """
+    Convert dict to string
+
+    Args:
+        data: dict
+        fmt: how key and value being represented
+        sep: how pairs of key and value are seperated
+
+    Returns:
+        str: string representation of dict
+    """
+    assert isinstance(data, dict)
+    return '{' + sep.join([
+        to_str(data=v, fmt=fmt, sep=sep)
+        if isinstance(v, dict) else fstr(fmt=fmt, key=k, value=v)
+        for k, v in data.items()
+    ]) + '}'
+
+
+def instance_signature(instance, fmt='json'):
+    """
+    Generate class instance signature from its __dict__
+    From python 3.6 dict is ordered and order of attributes will be preserved automatically
+
+    Args:
+        instance: class instance
+        fmt: ['json', 'str']
+
+    Returns:
+        str: string or json representation of instance
+    """
+    if not hasattr(instance, '__dict__'): return ''
+    if fmt == 'json': json.dumps(instance.__dict__, indent=2)
+    elif fmt == 'str': return to_str(instance.__dict__)
+    return ''
 
 
 if __name__ == '__main__':
