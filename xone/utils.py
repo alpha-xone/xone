@@ -243,7 +243,7 @@ class FString(object):
         return self.str_fmt.format(**kwargs)
 
 
-def to_str(data, fmt='{key}={value}', sep=', '):
+def to_str(data, fmt='{key}={value}', sep=', ', public_only=True):
     """
     Convert dict to string
 
@@ -251,19 +251,28 @@ def to_str(data, fmt='{key}={value}', sep=', '):
         data: dict
         fmt: how key and value being represented
         sep: how pairs of key and value are seperated
+        public_only: if display public members only
 
     Returns:
         str: string representation of dict
+
+    Examples:
+        >>> test_dict = dict(b=1, a=0, c=2, _d=3)
+        >>> assert to_str(test_dict) == '{b=1, a=0, c=2}'
+        >>> assert to_str(test_dict, sep='|') == '{b=1|a=0|c=2}'
+        >>> assert to_str(test_dict, public_only=False) == '{b=1, a=0, c=2, _d=3}'
     """
     assert isinstance(data, dict)
+    if public_only: keys = list(filter(lambda vv: vv[0] != '_', data.keys()))
+    else: keys = list(data.keys())
     return '{' + sep.join([
         to_str(data=v, fmt=fmt, sep=sep)
         if isinstance(v, dict) else fstr(fmt=fmt, key=k, value=v)
-        for k, v in data.items()
+        for k, v in data.items() if k in keys
     ]) + '}'
 
 
-def instance_signature(instance, fmt='json'):
+def inst_repr(instance, fmt='str', public_only=True):
     """
     Generate class instance signature from its __dict__
     From python 3.6 dict is ordered and order of attributes will be preserved automatically
@@ -271,13 +280,20 @@ def instance_signature(instance, fmt='json'):
     Args:
         instance: class instance
         fmt: ['json', 'str']
+        public_only: if display public members only
 
     Returns:
         str: string or json representation of instance
     """
+
     if not hasattr(instance, '__dict__'): return ''
-    if fmt == 'json': json.dumps(instance.__dict__, indent=2)
-    elif fmt == 'str': return to_str(instance.__dict__)
+
+    if public_only: inst_dict = {k: v for k, v in instance.__dict__.items() if k[0] != '_'}
+    else: inst_dict = instance.__dict__
+
+    if fmt == 'json': return json.dumps(inst_dict, indent=2)
+    elif fmt == 'str': return to_str(inst_dict, public_only=public_only)
+
     return ''
 
 
