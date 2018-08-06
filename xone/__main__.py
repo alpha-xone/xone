@@ -1,6 +1,6 @@
 def main():
-    import xdoctest as xdoc
-    xdoc.doctest_module('xone')
+    import xdoctest
+    xdoctest.doctest_module('xone')
 
 
 if __name__ == '__main__':

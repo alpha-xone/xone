@@ -47,5 +47,5 @@ if __name__ == '__main__':
     CommandLine:
         python -m xone.calendar all
     """
-    import xdoctest as xdoc
-    xdoc.doctest_module()
+    import xdoctest
+    xdoctest.doctest_module()
