@@ -208,6 +208,38 @@ def func_scope(func):
     return f'{cur_mod.__name__}.{func.__name__}'
 
 
+def format_float(digit=0, is_pct=False):
+    """
+    Number display format for pandas
+
+    Args:
+        digit: number of digits to keep
+               if negative, add one space in front of positive pct
+        is_pct: % display
+
+    Returns:
+        lambda function to format floats
+
+    Examples:
+        >>> assert format_float(0)(1e5) == '100,000'
+        >>> assert format_float(1)(1e5) == '100,000.0'
+        >>> assert format_float(-1, True)(.2) == ' 20.0%'
+        >>> assert format_float(-1, True)(-.2) == '-20.0%'
+        >>>
+        >>> import pandas as pd
+        >>> pd.options.display.float_format = format_float(2)
+    """
+    if is_pct:
+        space = ' ' if digit < 0 else ''
+        fmt = f'{{:{space}.{abs(int(digit))}%}}'
+        return lambda vv: 'NaN' if np.isnan(vv) else fmt.format(vv)
+
+    else:
+        return lambda vv: 'NaN' if np.isnan(vv) else (
+            f'{{:,.{digit}f}}'.format(vv) if vv else '-' + ' ' * abs(digit)
+        )
+
+
 def fstr(fmt, **kwargs):
     """
     Delayed evaluation of f-strings
