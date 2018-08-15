@@ -158,6 +158,35 @@ def _to_gen_(iterable):
         else: yield elm
 
 
+def to_frame(data_list, exc_cols=None):
+    """
+    Dict in Python 3.6 keeps insertion order, but cannot be relied upon
+    This method is to keep column names in order
+    In Python 3.7 this method is redundant
+
+    Args:
+        data_list: list of dict
+        exc_cols: exclude columns
+
+    Returns:
+        pd.DataFrame
+
+    Example:
+        >>> d_list = [
+        >>>     dict(id=1, symbol='1 HK', price=88.8),
+        >>>     dict(id=700, symbol='700 HK', price=350.)
+        >>> ]
+        >>>
+        >>> assert to_frame(d_list).columns.tolist() == ['id', 'symbol', 'price']
+        >>> assert to_frame(d_list, ['price']).columns.tolist() == ['id', 'symbol']
+    """
+    from collections import OrderedDict
+
+    return pd.DataFrame(
+        pd.Series(data_list).apply(OrderedDict).tolist()
+    ).drop(columns=[] if exc_cols is None else exc_cols)
+
+
 def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic', **kwargs):
     """
     Fit spline curve for given x, y values
