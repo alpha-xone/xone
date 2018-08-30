@@ -41,14 +41,11 @@ def parse_requirements(file_name):
     pip install requirements-parser
     fname='requirements.txt'
     """
-    import requirements
-
     from os.path import dirname, join, exists
     require_path = join(dirname(__file__), file_name)
     if exists(require_path):
         with open(require_path, 'r') as file:
-            requires = list(requirements.parse(file))
-            return [r.name for r in requires]
+            return [line.rstrip() for line in file.readlines()]
     return []
 
 
