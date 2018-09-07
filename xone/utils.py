@@ -358,6 +358,35 @@ def inst_repr(instance, fmt='str', public_only=True):
     return ''
 
 
+def load_module(full_path):
+    """
+    Load module from full path
+
+    Args:
+        full_path: module full path name
+
+    Returns:
+        python module
+
+    References:
+        https://stackoverflow.com/a/67692/1332656
+
+    Examples:
+        load_module('/path/to/file.py')
+    """
+    from importlib import util
+
+    file_name = full_path.replace('\\', '/').split('/')[-1]
+    assert file_name[-3:] == '.py'
+    module_name = file_name[:-3]
+
+    spec = util.spec_from_file_location(name=module_name, location=full_path)
+    module = util.module_from_spec(spec=spec)
+    spec.loader.exec_module(module=module)
+
+    return module
+
+
 class AttributeDict(dict):
     """
     Dot access support for dict attributes
