@@ -113,12 +113,12 @@ def align_data(*args):
     return res.dropna(subset=data_cols)
 
 
-def cat_data(**kwargs):
+def cat_data(data_kw):
     """
     Concatenate data with ticker as sub column index
 
     Args:
-        **kwargs: key = ticker, value = pd.DataFrame
+        data_kw: key = ticker, value = pd.DataFrame
 
     Returns:
         pd.DataFrame
@@ -159,11 +159,11 @@ def cat_data(**kwargs):
         2018-09-10 10:14:00+10:00  31.04   11506  70.79    9170
         2018-09-10 10:15:00+10:00  31.04    9718  70.79    9791
     """
-    if len(kwargs) == 0: return pd.DataFrame()
+    if len(data_kw) == 0: return pd.DataFrame()
     return pd.DataFrame(pd.concat([
         data.assign(ticker=ticker).set_index('ticker', append=True)
             .unstack('ticker').swaplevel(0, 1, axis=1)
-        for ticker, data in kwargs.items()
+        for ticker, data in data_kw.items()
     ], axis=1))
 
 
