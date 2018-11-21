@@ -17,10 +17,53 @@ def tolist(iterable):
         list: list of unique values
 
     Examples:
-        >>> assert tolist('xyz') == ['xyz']
-        >>> assert tolist(['ab', 'cd', 'xy', 'ab']) == ['ab', 'cd', 'xy']
+        >>> tolist('xyz')
+        ['xyz']
+        >>> tolist(['ab', 'cd', 'xy', 'ab'])
+        ['ab', 'cd', 'xy']
     """
     return pd.Series(iterable).drop_duplicates().tolist()
+
+
+def fmt_dt(dt, fmt='%Y-%m-%d'):
+    """
+    Format date string
+
+    Args:
+        dt: any date format
+        fmt: output date format
+
+    Returns:
+        str: date format
+
+    Examples:
+        >>> fmt_dt(dt='2018-12')
+        '2018-12-01'
+        >>> fmt_dt(dt='2018-12-31', fmt='%Y%m%d')
+        '20181231'
+    """
+    return pd.Timestamp(dt).strftime(fmt)
+
+
+def trade_day(dt, cal='US'):
+    """
+    Latest trading day w.r.t given dt
+
+    Args:
+        dt: date of reference
+        cal: trading calendar
+
+    Returns:
+        pd.Timestamp: last trading day
+
+    Examples:
+        >>> trade_day('2018-12-25').strftime('%Y-%m-%d')
+        '2018-12-24'
+    """
+    from xone import calendar
+
+    dt = pd.Timestamp(dt).date()
+    return calendar.trading_dates(start=dt - pd.Timedelta('10D'), end=dt, calendar=cal)[-1]
 
 
 def cur_time(typ='date', tz='US/Eastern', trading=True, cal='US'):
@@ -37,9 +80,14 @@ def cur_time(typ='date', tz='US/Eastern', trading=True, cal='US'):
         relevant current time or date
 
     Examples:
+        >>> cur_time(typ='date')
         >>> cur_time(typ='time', tz='UTC')
         >>> cur_time(typ='time_path', tz='Asia/Hong_Kong')
         >>> cur_time(typ='raw', tz='Europe/London')
+        >>> cur_time(typ='')
+        >>> cur_dt = pd.Timestamp('today', tz='US/Eastern').strftime('%Y-%m-%d')
+        >>> cur_time(typ='date', trading=False) == cur_dt
+        True
     """
     dt = pd.Timestamp('now', tz=tz)
 
@@ -54,44 +102,6 @@ def cur_time(typ='date', tz='US/Eastern', trading=True, cal='US'):
     return trade_day(dt).date() if trading else dt.date()
 
 
-def trade_day(dt, cal='US'):
-    """
-    Latest trading day w.r.t given dt
-
-    Args:
-        dt: date of reference
-        cal: trading calendar
-
-    Returns:
-        pd.Timestamp: last trading day
-
-    Examples:
-        >>> assert fmt_dt(trade_day('2018-12-25')) == '2018-12-24'
-    """
-    from xone import calendar
-
-    dt = pd.Timestamp(dt).date()
-    return calendar.trading_dates(start=dt - pd.Timedelta('10D'), end=dt, calendar=cal)[-1]
-
-
-def fmt_dt(dt, fmt='%Y-%m-%d'):
-    """
-    Format date string
-
-    Args:
-        dt: any date format
-        fmt: output date format
-
-    Returns:
-        str: date format
-
-    Examples:
-        >>> assert fmt_dt(dt='2018-12') == '2018-12-01'
-        >>> assert fmt_dt(dt='2018-12-31', fmt='%Y%m%d') == '20181231'
-    """
-    return pd.Timestamp(dt).strftime(fmt)
-
-
 def align_data(*args):
     """
     Resample and aligh data for defined frequency
@@ -101,6 +111,41 @@ def align_data(*args):
 
     Returns:
         pd.DataFrame: aligned data with renamed columns
+
+    Examples:
+        >>> start = '2018-09-10T10:10:00'
+        >>> tz = 'Australia/Sydney'
+        >>> idx = pd.DatetimeIndex(start=start, periods=6, freq='min').tz_localize(tz)
+        >>> close_1 = [31.08, 31.10, 31.11, 31.07, 31.04, 31.04]
+        >>> vol_1 = [10166, 69981, 14343, 10096, 11506, 9718]
+        >>> d1 = pd.DataFrame(dict(price=close_1, volume=vol_1), index=idx)
+        >>> d1
+                                   price  volume
+        2018-09-10 10:10:00+10:00  31.08   10166
+        2018-09-10 10:11:00+10:00  31.10   69981
+        2018-09-10 10:12:00+10:00  31.11   14343
+        2018-09-10 10:13:00+10:00  31.07   10096
+        2018-09-10 10:14:00+10:00  31.04   11506
+        2018-09-10 10:15:00+10:00  31.04    9718
+        >>> close_2 = [70.81, 70.78, 70.85, 70.79, 70.79, 70.79]
+        >>> vol_2 = [4749, 6762, 4908, 2002, 9170, 9791]
+        >>> d2 = pd.DataFrame(dict(price=close_2, volume=vol_2), index=idx)
+        >>> d2
+                                   price  volume
+        2018-09-10 10:10:00+10:00  70.81    4749
+        2018-09-10 10:11:00+10:00  70.78    6762
+        2018-09-10 10:12:00+10:00  70.85    4908
+        2018-09-10 10:13:00+10:00  70.79    2002
+        2018-09-10 10:14:00+10:00  70.79    9170
+        2018-09-10 10:15:00+10:00  70.79    9791
+        >>> align_data(d1, d2)
+                                   price_1  volume_1  price_2  volume_2
+        2018-09-10 10:10:00+10:00    31.08     10166    70.81      4749
+        2018-09-10 10:11:00+10:00    31.10     69981    70.78      6762
+        2018-09-10 10:12:00+10:00    31.11     14343    70.85      4908
+        2018-09-10 10:13:00+10:00    31.07     10096    70.79      2002
+        2018-09-10 10:14:00+10:00    31.04     11506    70.79      9170
+        2018-09-10 10:15:00+10:00    31.04      9718    70.79      9791
     """
     res = pd.DataFrame(pd.concat([
         d.loc[~d.index.duplicated(keep='first')].rename(
@@ -130,26 +175,10 @@ def cat_data(data_kw):
         >>> close_1 = [31.08, 31.10, 31.11, 31.07, 31.04, 31.04]
         >>> vol_1 = [10166, 69981, 14343, 10096, 11506, 9718]
         >>> d1 = pd.DataFrame(dict(price=close_1, volume=vol_1), index=idx)
-        >>> d1
-                                   price  volume
-        2018-09-10 10:10:00+10:00  31.08   10166
-        2018-09-10 10:11:00+10:00  31.10   69981
-        2018-09-10 10:12:00+10:00  31.11   14343
-        2018-09-10 10:13:00+10:00  31.07   10096
-        2018-09-10 10:14:00+10:00  31.04   11506
-        2018-09-10 10:15:00+10:00  31.04    9718
         >>> close_2 = [70.81, 70.78, 70.85, 70.79, 70.79, 70.79]
         >>> vol_2 = [4749, 6762, 4908, 2002, 9170, 9791]
         >>> d2 = pd.DataFrame(dict(price=close_2, volume=vol_2), index=idx)
-        >>> d2
-                                   price  volume
-        2018-09-10 10:10:00+10:00  70.81    4749
-        2018-09-10 10:11:00+10:00  70.78    6762
-        2018-09-10 10:12:00+10:00  70.85    4908
-        2018-09-10 10:13:00+10:00  70.79    2002
-        2018-09-10 10:14:00+10:00  70.79    9170
-        2018-09-10 10:15:00+10:00  70.79    9791
-        >>> cat_data(**{'BHP AU': d1, 'RIO AU': d2})
+        >>> cat_data({'BHP AU': d1, 'RIO AU': d2})
         ticker                    BHP AU         RIO AU
                                    price  volume  price  volume
         2018-09-10 10:10:00+10:00  31.08   10166  70.81    4749
@@ -183,11 +212,16 @@ def flatten(iterable, maps=None, unique=False):
         https://stackoverflow.com/a/40857703/1332656
 
     Examples:
-        >>> assert flatten('abc') == ['abc']
-        >>> assert flatten(1) == [1]
-        >>> assert flatten(1.) == [1.]
-        >>> assert flatten(['ab', 'cd', ['xy', 'zz']]) == ['ab', 'cd', 'xy', 'zz']
-        >>> assert flatten(['ab', ['xy', 'zz']], maps={'xy': '0x'}) == ['ab', '0x', 'zz']
+        >>> flatten('abc')
+        ['abc']
+        >>> flatten(1)
+        [1]
+        >>> flatten(1.)
+        [1.0]
+        >>> flatten(['ab', 'cd', ['xy', 'zz']])
+        ['ab', 'cd', 'xy', 'zz']
+        >>> flatten(['ab', ['xy', 'zz']], maps={'xy': '0x'})
+        ['ab', '0x', 'zz']
     """
     if iterable is None: return []
     if maps is None: maps = dict()
@@ -231,8 +265,10 @@ def to_frame(data_list, exc_cols=None):
         >>>     dict(id=700, symbol='700 HK', price=350.)
         >>> ]
         >>>
-        >>> assert to_frame(d_list).columns.tolist() == ['id', 'symbol', 'price']
-        >>> assert to_frame(d_list, ['price']).columns.tolist() == ['id', 'symbol']
+        >>> to_frame(d_list).columns.tolist()
+        ['id', 'symbol', 'price']
+        >>> to_frame(d_list, ['price']).columns.tolist()
+        ['id', 'symbol']
     """
     from collections import OrderedDict
 
@@ -265,11 +301,20 @@ def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic', **kwargs
     Examples:
         >>> x = pd.Series([1, 2, 3])
         >>> y = pd.Series([np.exp(1), np.exp(2), np.exp(3)])
-        >>> r = spline_curve(
-        >>>     x=x, y=y, step=.5, val_min=3, val_max=18, fill_value='extrapolate'
-        >>> ).round(2)
-        >>> assert r.index.tolist() == [1., 1.5, 2., 2.5, 3.]
-        >>> assert r.round(2).tolist() == [3., 4.05, 7.39, 12.73, 18.]
+        >>> r = spline_curve(x=x, y=y, step=.5, val_min=3, val_max=18, fill_value='extrapolate')
+        >>> r.round(2).index.tolist()
+        [1.0, 1.5, 2.0, 2.5, 3.0]
+        >>> r.round(2).tolist()
+        [3.0, 4.05, 7.39, 12.73, 18.0]
+        >>> y_df = pd.DataFrame(dict(a=[np.exp(1), np.exp(2), np.exp(3)], b=[2, 3, 4]))
+        >>> r_df = spline_curve(x=x, y=y_df, step=.5, val_min=3, fill_value='extrapolate')
+        >>> r_df.round(2)
+                a   b
+        1.0  3.00 3.0
+        1.5  4.05 3.0
+        2.0  7.39 3.0
+        2.5 12.73 3.5
+        3.0 20.09 4.0
     """
     from scipy.interpolate import interp1d
     from collections import OrderedDict
@@ -304,12 +349,14 @@ def format_float(digit=0, is_pct=False):
         lambda function to format floats
 
     Examples:
-        >>> assert format_float(0)(1e5) == '100,000'
-        >>> assert format_float(1)(1e5) == '100,000.0'
-        >>> assert format_float(-1, True)(.2) == ' 20.0%'
-        >>> assert format_float(-1, True)(-.2) == '-20.0%'
-        >>>
-        >>> import pandas as pd
+        >>> format_float(0)(1e5)
+        '100,000'
+        >>> format_float(1)(1e5)
+        '100,000.0'
+        >>> format_float(-1, True)(.2)
+        ' 20.0%'
+        >>> format_float(-1, True)(-.2)
+        '-20.0%'
         >>> pd.options.display.float_format = format_float(2)
     """
     if is_pct:
@@ -321,6 +368,17 @@ def format_float(digit=0, is_pct=False):
         return lambda vv: 'NaN' if np.isnan(vv) else (
             f'{{:,.{digit}f}}'.format(vv) if vv else '-' + ' ' * abs(digit)
         )
+
+
+class FString(object):
+
+    def __init__(self, str_fmt):
+        self.str_fmt = str_fmt
+
+    def __str__(self):
+        kwargs = inspect.currentframe().f_back.f_globals.copy()
+        kwargs.update(inspect.currentframe().f_back.f_locals)
+        return self.str_fmt.format(**kwargs)
 
 
 def fstr(fmt, **kwargs):
@@ -341,21 +399,11 @@ def fstr(fmt, **kwargs):
     Examples:
         >>> fmt = '{file}.parq'
         >>> file = 'data'
-        >>> assert fstr(fmt, file=file) == 'data.parq'
+        >>> fstr(fmt, file=file)
+        'data.parq'
     """
     locals().update(kwargs)
     return f'{FString(str_fmt=fmt)}'
-
-
-class FString(object):
-
-    def __init__(self, str_fmt):
-        self.str_fmt = str_fmt
-
-    def __str__(self):
-        kwargs = inspect.currentframe().f_back.f_globals.copy()
-        kwargs.update(inspect.currentframe().f_back.f_locals)
-        return self.str_fmt.format(**kwargs)
 
 
 def to_str(data, fmt='{key}={value}', sep=', ', public_only=True):
@@ -373,9 +421,12 @@ def to_str(data, fmt='{key}={value}', sep=', ', public_only=True):
 
     Examples:
         >>> test_dict = dict(b=1, a=0, c=2, _d=3)
-        >>> assert to_str(test_dict) == '{b=1, a=0, c=2}'
-        >>> assert to_str(test_dict, sep='|') == '{b=1|a=0|c=2}'
-        >>> assert to_str(test_dict, public_only=False) == '{b=1, a=0, c=2, _d=3}'
+        >>> to_str(test_dict)
+        '{b=1, a=0, c=2}'
+        >>> to_str(test_dict, sep='|')
+        '{b=1|a=0|c=2}'
+        >>> to_str(test_dict, public_only=False)
+        '{b=1, a=0, c=2, _d=3}'
     """
     assert isinstance(data, dict)
     if public_only: keys = list(filter(lambda vv: vv[0] != '_', data.keys()))
@@ -458,4 +509,4 @@ if __name__ == '__main__':
         python -m xone.utils all
     """
     import xdoctest
-    xdoctest.doctest_module()
+    xdoctest.doctest_module(__file__)
