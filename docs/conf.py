@@ -20,7 +20,7 @@ PACKAGE_ROOT = os.path.abspath('../')
 
 def parse_version(package):
 
-    init_file = f'{PACKAGE_ROOT}/{package}/__init__.py'
+    init_file = '%s/%s/__init__.py' % (PACKAGE_ROOT, package)
     with open(init_file, 'r', encoding='utf-8') as f:
         for line in f.readlines():
             if '__version__' in line:

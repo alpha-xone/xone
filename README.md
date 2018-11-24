@@ -1,5 +1,8 @@
 # x1
 
+[![PyPI version](https://badge.fury.io/py/xone.svg)](https://badge.fury.io/py/xone)
+[![Documentation Status](https://readthedocs.org/projects/xone/badge/?version=latest)](https://xone.readthedocs.io/en/latest)
+
 Frequently used functions for financial data analysis
 
 Installation:
