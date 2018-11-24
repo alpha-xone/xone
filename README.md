@@ -1,4 +1,5 @@
 # x1
+
 Frequently used functions for financial data analysis
 
 Installation:
@@ -7,12 +8,16 @@ Installation:
 From pypi:
 ----------
 
-    pip install xone
+```
+pip install xone
+```
 
-From github (recommended):
+From github:
 --------------------------
 
-    pip install git+https://github.com/alpha-xone/xone.git -U
+```
+pip install git+https://github.com/alpha-xone/xone.git
+```
 
 Description:
 ------------
@@ -21,16 +26,14 @@ Description:
 - Files
 - Calendar
 - Logs
-- Cache
-- Plots
-- Multiprocessing
-- Bloomberg (TODO)
 
 Common Utilities
 ----------------
 
 Files
 -----
+
+Automatic check and create path and save files:
 
 ```python
 import pandas as pd
@@ -59,15 +62,3 @@ Calendar
 
 Logs
 ----
-
-Cache
------
-
-Plots
------
-
-Multiprocessing
----------------
-
-Bloomberg (TODO)
-----------------
