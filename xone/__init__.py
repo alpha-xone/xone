@@ -1,6 +1,6 @@
 """Frequently used functions for financial data analysis"""
 
-__version__ = '0.0.6'
+__version__ = '0.0.7'
 
 __submodules__ = [
     'utils',

@@ -1,7 +1,7 @@
 import pathlib
 from os import path
 from io import open
-from setuptools import setup
+from setuptools import setup, find_packages
 
 # for pip >= 10
 try:
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     setup(
         name='xone',
         version=parse_version('xone'),
-        description='',
+        description='Frequently used functions for financial data analysis',
         long_description=parse_description(),
         long_description_content_type='text/markdown',
         url='https://github.com/alpha-xone/xone',
@@ -58,5 +58,5 @@ if __name__ == '__main__':
                 f'{PACKAGE_ROOT}/venv/reqs.txt', session='hack'
             )
         ],
-        packages=['xone'],
+        packages=find_packages(include=['xone', 'xone.*']),
     )

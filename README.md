@@ -5,36 +5,15 @@
 
 Frequently used functions for financial data analysis
 
-Installation:
-=============
-
-From pypi:
-----------
+## Installation
 
 ```
 pip install xone
 ```
 
-From github:
---------------------------
+## Common Utilities
 
-```
-pip install git+https://github.com/alpha-xone/xone.git
-```
-
-Description:
-------------
-
-- Common Utilities
-- Files
-- Calendar
-- Logs
-
-Common Utilities
-----------------
-
-Files
------
+## Files
 
 Automatic check and create path and save files:
 
@@ -60,8 +39,6 @@ files.create_folder(data_file, is_file=True)
 sample.to_parquet(data_file)
 ```
 
-Calendar
---------
+## Calendar
 
-Logs
-----
+## Logs
