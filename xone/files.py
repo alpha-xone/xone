@@ -5,7 +5,7 @@ import re
 import glob
 import time
 
-DATE_FMT = '\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])'
+DATE_FMT = r'\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])'
 
 
 def exists(path):
