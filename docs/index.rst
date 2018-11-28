@@ -1,6 +1,8 @@
 x1
 ==
 
+|pypi| |version| |travis| |codecov| |docs| |codefactor| |license|
+
 Frequently used functions for financial data analysis
 
 Installation
@@ -12,6 +14,12 @@ Installation
 
 Tutorial
 ========
+
+Utilities
+---------
+
+Files
+-----
 
 Automatic check and create path and save files:
 
@@ -36,3 +44,22 @@ Automatic check and create path and save files:
 
     In[7]: files.create_folder(data_file, is_file=True)
     In[8]: sample.to_parquet(data_file)
+
+.. |pypi| image:: https://badge.fury.io/py/xone.svg
+    :target: https://badge.fury.io/py/xone
+.. |version| image:: https://img.shields.io/pypi/pyversions/xone.svg
+    :target: https://badge.fury.io/py/xone
+.. |travis| image:: https://img.shields.io/travis/alpha-xone/xone/master.svg?label=Travis%20CI
+    :target: https://travis-ci.com/alpha-xone/xone
+    :alt: Travis CI
+.. |codecov| image:: https://codecov.io/gh/alpha-xone/xone/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/alpha-xone/xone
+    :alt: Codecov
+.. |docs| image:: https://readthedocs.org/projects/xone/badge/?version=latest
+    :target: https://xone.readthedocs.io/en/latest
+.. |codefactor| image:: https://www.codefactor.io/repository/github/alpha-xone/xone/badge
+   :target: https://www.codefactor.io/repository/github/alpha-xone/xone
+   :alt: CodeFactor
+.. |license| image:: https://img.shields.io/github/license/alpha-xone/xone.svg
+    :alt: GitHub license
+    :target: https://github.com/alpha-xone/xone/blob/master/LICENSE
