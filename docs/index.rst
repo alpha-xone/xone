@@ -1,7 +1,15 @@
 x1
 ==
 
-|pypi| |version| |travis| |codecov| |docs| |codefactor| |license|
+============== ======================
+Latest Release |pypi|
+\              |version|
+Build          |travis|
+Coverage       |codecov|
+Docs           |docs|
+Quality        |codeFactor|
+License        |license|
+============== ======================
 
 Frequently used functions for financial data analysis
 
@@ -45,7 +53,7 @@ Automatic check and create path and save files:
     In[7]: files.create_folder(data_file, is_file=True)
     In[8]: sample.to_parquet(data_file)
 
-.. |pypi| image:: https://badge.fury.io/py/xone.svg
+.. |pypi| image:: https://img.shields.io/pypi/v/xone.svg
     :target: https://badge.fury.io/py/xone
 .. |version| image:: https://img.shields.io/pypi/pyversions/xone.svg
     :target: https://badge.fury.io/py/xone

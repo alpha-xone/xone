@@ -1,12 +1,13 @@
 # x1
-
-[![PyPI version](https://badge.fury.io/py/xone.svg)](https://badge.fury.io/py/xone)
-[![PyPI version](https://img.shields.io/pypi/pyversions/xone.svg)](https://badge.fury.io/py/xone)
-[![Travis CI](https://img.shields.io/travis/alpha-xone/xone/master.svg?label=Travis%20CI)](https://travis-ci.com/alpha-xone/xone)
-[![codecov](https://codecov.io/gh/alpha-xone/xone/branch/master/graph/badge.svg)](https://codecov.io/gh/alpha-xone/xone)
-[![Documentation Status](https://readthedocs.org/projects/xone/badge/?version=latest)](https://xone.readthedocs.io/en/latest)
-[![CodeFactor](https://www.codefactor.io/repository/github/alpha-xone/xone/badge)](https://www.codefactor.io/repository/github/alpha-xone/xone)
-[![GitHub license](https://img.shields.io/github/license/alpha-xone/xone.svg)](https://github.com/alpha-xone/xone/blob/master/LICENSE)
+|                |                                                                                                                                                 |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Latest Release | [![PyPI version](https://img.shields.io/pypi/v/xone.svg)](https://badge.fury.io/py/xone)                                               |
+|                | [![PyPI version](https://img.shields.io/pypi/pyversions/xone.svg)](https://badge.fury.io/py/xone)                                               |
+| Build          | [![Travis CI](https://img.shields.io/travis/alpha-xone/xone/master.svg?label=Travis%20CI)](https://travis-ci.com/alpha-xone/xone)               |
+| Coverage       | [![codecov](https://codecov.io/gh/alpha-xone/xone/branch/master/graph/badge.svg)](https://codecov.io/gh/alpha-xone/xone)                        |
+| Docs           | [![Documentation Status](https://readthedocs.org/projects/xone/badge/?version=latest)](https://xone.readthedocs.io/en/latest)                   |
+| Quality        | [![CodeFactor](https://www.codefactor.io/repository/github/alpha-xone/xone/badge)](https://www.codefactor.io/repository/github/alpha-xone/xone) |
+| License        | [![GitHub license](https://img.shields.io/github/license/alpha-xone/xone.svg)](https://github.com/alpha-xone/xone/blob/master/LICENSE)          |
 
 Frequently used functions for financial data analysis
 
