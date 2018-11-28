@@ -15,7 +15,7 @@
 import os
 import sys
 
-PACKAGE_ROOT = os.path.abspath('../')
+PACKAGE_ROOT = '/'.join(os.path.abspath(__file__).replace('\\', '/').split('/')[:-2])
 
 
 def parse_version(package):

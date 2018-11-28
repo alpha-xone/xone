@@ -71,12 +71,3 @@ def saturate_kwargs(keys, **kwargs):
     kw_arr = [{**k, **kwargs} for k in kw_arr]
 
     return kw_arr
-
-
-if __name__ == '__main__':
-    """
-    CommandLine:
-        python -m xone.procs all
-    """
-    import xdoctest
-    xdoctest.doctest_module()

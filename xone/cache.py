@@ -113,7 +113,10 @@ def save_data(data, file_fmt, append=False, drop_dups=None, info=None, **kwargs)
 
     Examples:
         >>> data = pd.DataFrame([[1, 2], [3, 4]], columns=['a', 'b'])
-        >>> save_data(data, '{ROOT}/daily/{typ}.parq', ROOT='/data', typ='earnings')
+        >>> # save_data(
+        >>>     # data, '{ROOT}/daily/{typ}.parq',
+        >>>     # ROOT='tests/data', typ='earnings'
+        >>> # )
     """
     from xone import utils
 

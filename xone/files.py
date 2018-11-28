@@ -126,8 +126,8 @@ def latest_file(path_name, keyword='', ext='', debug=False):
     """
     files = all_files(path_name=path_name, keyword=keyword, ext=ext, full_path=True)
 
-    if len(files) == 0:
-        if debug: print('File is not found in folder: %s' % path_name)
+    if not files:
+        if debug: print(f'File is not found in folder: {path_name}')
         return ''
 
     modified_time = [os.path.getmtime(f) for f in files]
@@ -139,12 +139,3 @@ def latest_file(path_name, keyword='', ext='', debug=False):
 def file_modified_time(file_name):
 
     return pd.to_datetime(time.ctime(os.path.getmtime(filename=file_name)))
-
-
-if __name__ == '__main__':
-    """
-    CommandLine:
-        python -m xone.files all
-    """
-    import xdoctest
-    xdoctest.doctest_module()

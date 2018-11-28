@@ -1,9 +1,13 @@
 import numpy as np
 import pandas as pd
 
-import sys
-import inspect
 import json
+import time
+import pytz
+import inspect
+import sys
+
+DEFAULT_TZ = pytz.FixedOffset(-time.timezone / 60)
 
 
 def tolist(iterable):
@@ -66,7 +70,7 @@ def trade_day(dt, cal='US'):
     return calendar.trading_dates(start=dt - pd.Timedelta('10D'), end=dt, calendar=cal)[-1]
 
 
-def cur_time(typ='date', tz='US/Eastern', trading=True, cal='US'):
+def cur_time(typ='date', tz=DEFAULT_TZ, trading=True, cal='US'):
     """
     Current time
 
@@ -80,13 +84,18 @@ def cur_time(typ='date', tz='US/Eastern', trading=True, cal='US'):
         relevant current time or date
 
     Examples:
-        >>> cur_time(typ='date')
-        >>> cur_time(typ='time', tz='UTC')
-        >>> cur_time(typ='time_path', tz='Asia/Hong_Kong')
-        >>> cur_time(typ='raw', tz='Europe/London')
-        >>> cur_time(typ='')
-        >>> cur_dt = pd.Timestamp('today', tz='US/Eastern').strftime('%Y-%m-%d')
-        >>> cur_time(typ='date', trading=False) == cur_dt
+        >>> cur_dt = pd.Timestamp('now')
+        >>> cur_time(typ='date', trading=False) == cur_dt.strftime('%Y-%m-%d')
+        True
+        >>> cur_time(typ='time', trading=False) == cur_dt.strftime('%Y-%m-%d %H:%M:%S')
+        True
+        >>> cur_time(typ='time_path', trading=False) == cur_dt.strftime('%Y-%m-%d/%H-%M-%S')
+        True
+        >>> isinstance(cur_time(typ='raw', tz='Europe/London'), pd.Timestamp)
+        True
+        >>> isinstance(cur_time(typ='raw', trading=True), pd.Timestamp)
+        True
+        >>> cur_time(typ='') == cur_dt.date()
         True
     """
     dt = pd.Timestamp('now', tz=tz)
@@ -178,15 +187,19 @@ def cat_data(data_kw):
         >>> close_2 = [70.81, 70.78, 70.85, 70.79, 70.79, 70.79]
         >>> vol_2 = [4749, 6762, 4908, 2002, 9170, 9791]
         >>> d2 = pd.DataFrame(dict(price=close_2, volume=vol_2), index=idx)
-        >>> cat_data({'BHP AU': d1, 'RIO AU': d2})
-        ticker                    BHP AU         RIO AU
-                                   price  volume  price  volume
-        2018-09-10 10:10:00+10:00  31.08   10166  70.81    4749
-        2018-09-10 10:11:00+10:00  31.10   69981  70.78    6762
-        2018-09-10 10:12:00+10:00  31.11   14343  70.85    4908
-        2018-09-10 10:13:00+10:00  31.07   10096  70.79    2002
-        2018-09-10 10:14:00+10:00  31.04   11506  70.79    9170
-        2018-09-10 10:15:00+10:00  31.04    9718  70.79    9791
+        >>> sample = cat_data({'BHP AU': d1, 'RIO AU': d2})
+        >>> sample.columns
+        MultiIndex(levels=[['BHP AU', 'RIO AU'], ['price', 'volume']],
+                   labels=[[0, 0, 1, 1], [0, 1, 0, 1]],
+                   names=['ticker', None])
+        >>> r = sample.transpose().iloc[:, :2]
+        >>> r.index.names = (None, None)
+        >>> r
+                       2018-09-10 10:10:00+10:00  2018-09-10 10:11:00+10:00
+        BHP AU price                       31.08                      31.10
+               volume                   10166.00                   69981.00
+        RIO AU price                       70.81                      70.78
+               volume                    4749.00                    6762.00
     """
     if len(data_kw) == 0: return pd.DataFrame()
     return pd.DataFrame(pd.concat([
@@ -261,10 +274,9 @@ def to_frame(data_list, exc_cols=None):
 
     Example:
         >>> d_list = [
-        >>>     dict(id=1, symbol='1 HK', price=88.8),
-        >>>     dict(id=700, symbol='700 HK', price=350.)
-        >>> ]
-        >>>
+        ...     dict(id=1, symbol='1 HK', price=88.8),
+        ...     dict(id=700, symbol='700 HK', price=350.)
+        ... ]
         >>> to_frame(d_list).columns.tolist()
         ['id', 'symbol', 'price']
         >>> to_frame(d_list, ['price']).columns.tolist()
@@ -309,12 +321,12 @@ def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic', **kwargs
         >>> y_df = pd.DataFrame(dict(a=[np.exp(1), np.exp(2), np.exp(3)], b=[2, 3, 4]))
         >>> r_df = spline_curve(x=x, y=y_df, step=.5, val_min=3, fill_value='extrapolate')
         >>> r_df.round(2)
-                a   b
-        1.0  3.00 3.0
-        1.5  4.05 3.0
-        2.0  7.39 3.0
-        2.5 12.73 3.5
-        3.0 20.09 4.0
+                 a    b
+        1.00  3.00 3.00
+        1.50  4.05 3.00
+        2.00  7.39 3.00
+        2.50 12.73 3.50
+        3.00 20.09 4.00
     """
     from scipy.interpolate import interp1d
     from collections import OrderedDict
@@ -331,7 +343,21 @@ def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic', **kwargs
 
 
 def func_scope(func):
+    """
+    Function scope name
 
+    Args:
+        func: python function
+
+    Returns:
+        str: module_name.func_name
+
+    Examples:
+        >>> func_scope(flatten)
+        'xone.utils.flatten'
+        >>> func_scope(json.dump)
+        'json.dump'
+    """
     cur_mod = sys.modules[func.__module__]
     return f'{cur_mod.__name__}.{func.__name__}'
 
@@ -397,10 +423,9 @@ def fstr(fmt, **kwargs):
         https://stackoverflow.com/a/4014070/1332656
 
     Examples:
-        >>> fmt = '{file}.parq'
-        >>> file = 'data'
-        >>> fstr(fmt, file=file)
-        'data.parq'
+        >>> fmt = '{data_path}/{data_file}.parq'
+        >>> fstr(fmt, data_path='your/data/path', data_file='sample')
+        'your/data/path/sample.parq'
     """
     locals().update(kwargs)
     return f'{FString(str_fmt=fmt)}'
@@ -450,8 +475,26 @@ def inst_repr(instance, fmt='str', public_only=True):
 
     Returns:
         str: string or json representation of instance
-    """
 
+    Examples:
+        >>> inst_repr(1)
+        ''
+        >>> class SampleClass(object):
+        ...     def __init__(self):
+        ...         self.b = 3
+        ...         self.a = 4
+        ...         self._private_ = 'hidden'
+        >>>
+        >>> s = SampleClass()
+        >>> inst_repr(s)
+        '{b=3, a=4}'
+        >>> inst_repr(s, public_only=False)
+        '{b=3, a=4, _private_=hidden}'
+        >>> json.loads(inst_repr(s, fmt='json'))
+        {'b': 3, 'a': 4}
+        >>> inst_repr(s, fmt='unknown')
+        ''
+    """
     if not hasattr(instance, '__dict__'): return ''
 
     if public_only: inst_dict = {k: v for k, v in instance.__dict__.items() if k[0] != '_'}
@@ -477,7 +520,12 @@ def load_module(full_path):
         https://stackoverflow.com/a/67692/1332656
 
     Examples:
-        load_module('/path/to/file.py')
+        >>> import os
+        >>>
+        >>> cur_file = os.path.abspath(__file__).replace('\\\\', '/')
+        >>> cur_path = '/'.join(cur_file.split('/')[:-1])
+        >>> load_module(f'{cur_path}/files.py').__name__
+        'files'
     """
     from importlib import util
 
@@ -501,12 +549,3 @@ class AttributeDict(dict):
     """
     __getattr__ = dict.__getitem__
     __setattr__ = dict.__setitem__
-
-
-if __name__ == '__main__':
-    """
-    CommandLine:
-        python -m xone.utils all
-    """
-    import xdoctest
-    xdoctest.doctest_module(__file__)

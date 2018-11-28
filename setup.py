@@ -55,7 +55,7 @@ if __name__ == '__main__':
         include_package_data=True,
         install_requires=[
             str(ir.req) for ir in parse_requirements(
-                f'{PACKAGE_ROOT}/venv/reqs.txt', session='hack'
+                f'{PACKAGE_ROOT}/requirements.txt', session='hack'
             )
         ],
         packages=find_packages(include=['xone', 'xone.*']),
