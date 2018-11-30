@@ -1,6 +1,7 @@
 # x1
 |                |                                                                                                                                                 |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/92d1f7214d9c4a4bb5c9934eba06596f)](https://app.codacy.com/app/alpha-xone/xone?utm_source=github.com&utm_medium=referral&utm_content=alpha-xone/xone&utm_campaign=Badge_Grade_Dashboard)
 | Latest Release | [![PyPI version](https://img.shields.io/pypi/v/xone.svg)](https://badge.fury.io/py/xone)                                               |
 |                | [![PyPI version](https://img.shields.io/pypi/pyversions/xone.svg)](https://badge.fury.io/py/xone)                                               |
 | Build          | [![Travis CI](https://img.shields.io/travis/alpha-xone/xone/master.svg?label=Travis%20CI)](https://travis-ci.com/alpha-xone/xone)               |
