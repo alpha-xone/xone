@@ -18,7 +18,7 @@ install:
 
 script:
   - flake8 --extend-ignore=E701,E501 xone
-  - pytest xone
+  - pytest xone --doctest-module --cov -v
 
 after_success:
   - coverage report
