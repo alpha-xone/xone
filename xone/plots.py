@@ -38,23 +38,23 @@ def plot_multi(data, cols=None, spacing=.06, color_map=None, plot_kw=None, **kwa
 
     fig = plt.figure()
     ax, lines, labels, c_idx = None, [], [], 0
-    for n in range(0, len(cols)):
-        if isinstance(cols[n], (list, tuple)):
+    for n, col in enumerate(cols):
+        if isinstance(col, (list, tuple)):
             ylabel = ' / '.join(cols[n])
             color = [
                 color_map.get(cols[n][_ - c_idx], colors[_ % len(colors)])
                 for _ in range(c_idx, c_idx + len(cols[n]))
             ]
-            c_idx += len(cols[n])
+            c_idx += len(col)
         else:
-            ylabel = cols[n]
-            color = color_map.get(cols[n], colors[c_idx % len(colors)])
+            ylabel = col
+            color = color_map.get(col, colors[c_idx % len(colors)])
             c_idx += 1
 
         if ax is None:
             # First y-axes
-            ax = data.loc[:, cols[n]].plot(
-                label=cols[n], color=color, legend=False, zorder=n, **plot_kw[0], **kwargs
+            ax = data.loc[:, col].plot(
+                label=col, color=color, legend=False, zorder=n, **plot_kw[0], **kwargs
             )
             ax.set_ylabel(ylabel=ylabel)
             line, label = ax.get_legend_handles_labels()
@@ -65,8 +65,8 @@ def plot_multi(data, cols=None, spacing=.06, color_map=None, plot_kw=None, **kwa
             # Multiple y-axes
             ax_new = ax.twinx()
             ax_new.spines['right'].set_position(('axes', 1 + spacing * (n - 1)))
-            data.loc[:, cols[n]].plot(
-                ax=ax_new, label=cols[n], color=color, legend=False, zorder=n, **plot_kw[n]
+            data.loc[:, col].plot(
+                ax=ax_new, label=col, color=color, legend=False, zorder=n, **plot_kw[n]
             )
             ax_new.set_ylabel(ylabel=ylabel)
             line, label = ax_new.get_legend_handles_labels()
@@ -110,9 +110,9 @@ def plot_h(data, cols, wspace=.1, plot_kw=None, **kwargs):
 
     if plot_kw is None: plot_kw = [dict()] * len(cols)
 
-    fig, axes = plt.subplots(nrows=1, ncols=len(cols), **kwargs)
+    _, axes = plt.subplots(nrows=1, ncols=len(cols), **kwargs)
     plt.subplots_adjust(wspace=wspace)
-    for n in range(len(cols)):
-        data.loc[:, cols[n]].plot(ax=axes[n], **plot_kw[n])
+    for n, col in enumerate(cols):
+        data.loc[:, col].plot(ax=axes[n], **plot_kw[n])
 
     return axes

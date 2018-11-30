@@ -118,8 +118,6 @@ def save_data(data, file_fmt, append=False, drop_dups=None, info=None, **kwargs)
         >>>     # ROOT='tests/data', typ='earnings'
         >>> # )
     """
-    from xone import utils
-
     d_file = data_file(file_fmt=file_fmt, info=info, **kwargs)
     if append and files.exists(d_file):
         data = pd.DataFrame(pd.concat([pd.read_parquet(d_file), data], sort=False))
@@ -143,10 +141,8 @@ def data_file(file_fmt, info=None, **kwargs):
     Returns:
         str: data file name
     """
-    from xone import utils
-
     if isinstance(info, dict):
-        kwargs['hash_key'] = hashlib.md5(json.dumps(info).encode('utf-8')).hexdigest()
+        kwargs['hash_key'] = hashlib.sha256(json.dumps(info).encode('utf-8')).hexdigest()
         kwargs.update(info)
 
     return utils.fstr(fmt=file_fmt, **kwargs)

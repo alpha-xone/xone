@@ -8,6 +8,7 @@ Build          |travis|
 Coverage       |codecov|
 Docs           |docs|
 Quality        |codeFactor|
+\              |codacy|
 License        |license|
 ============== ======================
 
@@ -68,6 +69,8 @@ Automatic check and create path and save files:
 .. |codefactor| image:: https://www.codefactor.io/repository/github/alpha-xone/xone/badge
    :target: https://www.codefactor.io/repository/github/alpha-xone/xone
    :alt: CodeFactor
+.. |codacy| image:: https://api.codacy.com/project/badge/Grade/eb3d11949a1343d9aa4806a31f3fcc41
+   :target: https://www.codacy.com/app/alpha-xone/xone
 .. |license| image:: https://img.shields.io/github/license/alpha-xone/xone.svg
     :alt: GitHub license
     :target: https://github.com/alpha-xone/xone/blob/master/LICENSE

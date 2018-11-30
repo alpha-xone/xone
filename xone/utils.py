@@ -431,7 +431,7 @@ def fstr(fmt, **kwargs):
     return f'{FString(str_fmt=fmt)}'
 
 
-def to_str(data, fmt='{key}={value}', sep=', ', public_only=True):
+def to_str(data: dict, fmt='{key}={value}', sep=', ', public_only=True):
     """
     Convert dict to string
 
@@ -453,7 +453,6 @@ def to_str(data, fmt='{key}={value}', sep=', ', public_only=True):
         >>> to_str(test_dict, public_only=False)
         '{b=1, a=0, c=2, _d=3}'
     """
-    assert isinstance(data, dict)
     if public_only: keys = list(filter(lambda vv: vv[0] != '_', data.keys()))
     else: keys = list(data.keys())
     return '{' + sep.join([
@@ -526,11 +525,15 @@ def load_module(full_path):
         >>> cur_path = '/'.join(cur_file.split('/')[:-1])
         >>> load_module(f'{cur_path}/files.py').__name__
         'files'
+        >>> load_module(f'{cur_path}/files.pyc')
+        Traceback (most recent call last):
+        ImportError: not a python file: files.pyc
     """
     from importlib import util
 
     file_name = full_path.replace('\\', '/').split('/')[-1]
-    assert file_name[-3:] == '.py'
+    if file_name[-3:] != '.py':
+        raise ImportError(f'not a python file: {file_name}')
     module_name = file_name[:-3]
 
     spec = util.spec_from_file_location(name=module_name, location=full_path)
