@@ -40,9 +40,6 @@ Convert anything to list.
     In[2]: ticker = 'BHP AU'
     In[3]: list_of_tickers = tolist(ticker)
     In[4]: list_of_tickers
-
-.. code:: python
-
     Out[4]: ['BHP AU']
 
     In[5]: raw_price = [31.08, 31.10, 31.11, 31.07, 31.04, 31.04]
