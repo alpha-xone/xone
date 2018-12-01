@@ -95,7 +95,7 @@ def cur_time(typ='date', tz=DEFAULT_TZ, trading=True, cal='US'):
         True
         >>> isinstance(cur_time(typ='raw', trading=True), pd.Timestamp)
         True
-        >>> cur_time(typ='') == cur_dt.date()
+        >>> cur_time(typ='', trading=False) == cur_dt.date()
         True
     """
     dt = pd.Timestamp('now', tz=tz)
