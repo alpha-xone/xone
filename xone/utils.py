@@ -259,7 +259,7 @@ def _to_gen_(iterable):
         else: yield elm
 
 
-def to_frame(data_list, exc_cols=None):
+def to_frame(data_list, exc_cols=None, **kwargs):
     """
     Dict in Python 3.6 keeps insertion order, but cannot be relied upon
     This method is to keep column names in order
@@ -289,7 +289,7 @@ def to_frame(data_list, exc_cols=None):
     from collections import OrderedDict
 
     return pd.DataFrame(
-        pd.Series(data_list).apply(OrderedDict).tolist()
+        pd.Series(data_list).apply(OrderedDict).tolist(), **kwargs
     ).drop(columns=[] if exc_cols is None else exc_cols)
 
 
