@@ -4,11 +4,11 @@ x1
 ============== ======================
 Latest Release |pypi|
 \              |version|
+Docs           |docs|
 Build          |travis|
 Coverage       |codecov|
-Docs           |docs|
-Quality        |codeFactor|
-\              |codacy|
+Quality        |codacy|
+\              |codeFactor|
 License        |license|
 ============== ======================
 
