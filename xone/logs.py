@@ -2,10 +2,11 @@ import logging
 
 from xone import utils
 
+LOG_FMT = '%(asctime)s:%(name)s:%(levelname)s:%(message)s'
+
 
 def get_logger(
-        name_or_func, log_file='', level=logging.INFO,
-        fmt='%(asctime)s:%(name)s:%(levelname)s:%(message)s', types='stream'
+        name_or_func, log_file='', level=logging.INFO, types='stream', **kwargs
 ):
     """
     Generate logger
@@ -14,7 +15,6 @@ def get_logger(
         name_or_func: logger name or current running function
         log_file: logger file
         level: level of logs - debug, info, error
-        fmt: log formats
         types: file or stream, or both
 
     Returns:
@@ -32,7 +32,7 @@ def get_logger(
     logger.setLevel(level=level)
 
     if not len(logger.handlers):
-        formatter = logging.Formatter(fmt=fmt)
+        formatter = logging.Formatter(fmt=kwargs.get('fmt', LOG_FMT))
 
         if 'file' in types:
             file_handler = logging.FileHandler(log_file)
