@@ -129,11 +129,11 @@ def all_folders(
         ...     print(f.split('/')[-1])
         test_1
         test_2
-        >>> for f in all_folders(target_folder, has_date=True):
+        >>> for f in sorted(all_folders(target_folder, has_date=True)):
         ...     print(f.split('/')[-1])
-        dates_2019-01-03
-        dates_2019-01-02_labeled
         dates_2019-01-01
+        dates_2019-01-02_labeled
+        dates_2019-01-03
     """
     if not os.path.exists(path=path_name): return []
     path_name = path_name.replace('\\', '/')
