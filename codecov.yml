@@ -1,0 +1,7 @@
+ignore:
+  - xone/plots.py
+  - xone/procs.py
+  - xone/cache.py
+  - xone/profile.py
+  - "xone/tests/*"
+  - "*/__init__.py"

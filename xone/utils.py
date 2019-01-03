@@ -197,9 +197,9 @@ def cat_data(data_kw):
         >>> r
                        2018-09-10 10:10:00+10:00  2018-09-10 10:11:00+10:00
         BHP AU price                       31.08                      31.10
-               volume                   10166.00                   69981.00
+               volume                  10,166.00                  69,981.00
         RIO AU price                       70.81                      70.78
-               volume                    4749.00                    6762.00
+               volume                   4,749.00                   6,762.00
     """
     if len(data_kw) == 0: return pd.DataFrame()
     return pd.DataFrame(pd.concat([
@@ -274,13 +274,13 @@ def to_frame(data_list, exc_cols=None, **kwargs):
 
     Example:
         >>> d_list = [
-        ...     dict(sid=1, symbol='1 HK', price=88.8),
-        ...     dict(sid=700, symbol='700 HK', price=350.)
+        ...     dict(sid=1, symbol='1 HK', price=89),
+        ...     dict(sid=700, symbol='700 HK', price=350)
         ... ]
         >>> to_frame(d_list)
            sid  symbol  price
-        0    1    1 HK  88.80
-        1  700  700 HK 350.00
+        0    1    1 HK     89
+        1  700  700 HK    350
         >>> to_frame(d_list, exc_cols=['price'])
            sid  symbol
         0    1    1 HK

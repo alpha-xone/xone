@@ -2,9 +2,9 @@
 omit =
     */__init__.py
     xone/plots.py
-    xone/files.py
     xone/procs.py
     xone/cache.py
+    xone/profile.py
 
 [html]
 directory = htmlcov
