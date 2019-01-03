@@ -48,9 +48,6 @@ def create_folder(path_name: str, is_file=False):
     Args:
         path_name: full path name
         is_file: whether input is name of file
-
-    Examples:
-        >>> create_folder(f'{abspath(__file__)}/tests')
     """
     path_sep = path_name.replace('\\', '/').split('/')
     for i in range(1, len(path_sep) + (0 if is_file else 1)):
@@ -175,6 +172,7 @@ def filter_by_dates(files_or_folders: list, date_fmt=DATE_FMT) -> list:
 
     Args:
         files_or_folders: list of files or folders
+        date_fmt: date format
 
     Returns:
         list
