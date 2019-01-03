@@ -1,6 +1,7 @@
 [run]
 omit =
     */__init__.py
+    xone/tests/*
     xone/plots.py
     xone/procs.py
     xone/cache.py

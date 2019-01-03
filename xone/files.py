@@ -50,7 +50,7 @@ def create_folder(path_name: str, is_file=False):
         is_file: whether input is name of file
 
     Examples:
-        >>> create_folder(f'{abspath(__file__)}/tests/files')
+        >>> create_folder(f'{abspath(__file__)}/tests')
     """
     path_sep = path_name.replace('\\', '/').split('/')
     for i in range(1, len(path_sep) + (0 if is_file else 1)):
