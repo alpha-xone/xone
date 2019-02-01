@@ -39,4 +39,4 @@ def trading_dates(start, end, calendar='US'):
     """
     kw = dict(start=pd.Timestamp(start, tz='UTC').date(), end=pd.Timestamp(end, tz='UTC').date())
     us_cal = getattr(sys.modules[__name__], f'{calendar}TradingCalendar')()
-    return pd.DatetimeIndex(freq='B', **kw).drop(us_cal.holidays(**kw))
+    return pd.bdate_range(**kw).drop(us_cal.holidays(**kw))
