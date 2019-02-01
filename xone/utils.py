@@ -190,7 +190,7 @@ def cat_data(data_kw):
         >>> sample = cat_data({'BHP AU': d1, 'RIO AU': d2})
         >>> sample.columns
         MultiIndex(levels=[['BHP AU', 'RIO AU'], ['price', 'volume']],
-                   labels=[[0, 0, 1, 1], [0, 1, 0, 1]],
+                   codes=[[0, 0, 1, 1], [0, 1, 0, 1]],
                    names=['ticker', None])
         >>> r = sample.transpose().iloc[:, :2]
         >>> r.index.names = (None, None)
