@@ -28,7 +28,7 @@ def plot_multi(data, cols=None, spacing=.06, color_map=None, plot_kw=None, **kwa
     from pandas import plotting
 
     if cols is None: cols = data.columns
-    if plot_kw is None: plot_kw = [dict(), dict()]
+    if plot_kw is None: plot_kw = [{}] * len(cols)
     if len(cols) == 0: return
     num_colors = len(utils.flatten(cols))
 
@@ -50,11 +50,13 @@ def plot_multi(data, cols=None, spacing=.06, color_map=None, plot_kw=None, **kwa
             ylabel = col
             color = color_map.get(col, colors[c_idx % len(colors)])
             c_idx += 1
+        if 'color' in plot_kw[n]: color = plot_kw[n].pop('color')
 
         if ax is None:
             # First y-axes
+            legend = plot_kw[0].pop('legend', kwargs.pop('legend', False))
             ax = data.loc[:, col].plot(
-                label=col, color=color, legend=False, zorder=n, **plot_kw[0], **kwargs
+                label=col, color=color, legend=legend, zorder=n, **plot_kw[0], **kwargs
             )
             ax.set_ylabel(ylabel=ylabel)
             line, label = ax.get_legend_handles_labels()
@@ -63,10 +65,11 @@ def plot_multi(data, cols=None, spacing=.06, color_map=None, plot_kw=None, **kwa
 
         else:
             # Multiple y-axes
+            legend = plot_kw[n].pop('legend', False)
             ax_new = ax.twinx()
             ax_new.spines['right'].set_position(('axes', 1 + spacing * (n - 1)))
             data.loc[:, col].plot(
-                ax=ax_new, label=col, color=color, legend=False, zorder=n, **plot_kw[n]
+                ax=ax_new, label=col, color=color, legend=legend, zorder=n, **plot_kw[n]
             )
             ax_new.set_ylabel(ylabel=ylabel)
             line, label = ax_new.get_legend_handles_labels()
