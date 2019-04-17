@@ -235,10 +235,5 @@ def file_modified_time(file_name) -> pd.Timestamp:
 
     Returns:
         pd.Timestamp
-
-    Examples:
-        >>> target_file = f'{abspath(__file__)}/tests/files/test_2.json'
-        >>> file_modified_time(target_file).date()
-        datetime.date(2019, 2, 1)
     """
-    return pd.to_datetime(time.ctime(os.path.getmtime(filename=file_name)))
+    return pd.to_datetime(time.ctime(os.path.getmtime(file_name)))

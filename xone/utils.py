@@ -124,7 +124,7 @@ def align_data(*args):
     Examples:
         >>> start = '2018-09-10T10:10:00'
         >>> tz = 'Australia/Sydney'
-        >>> idx = pd.DatetimeIndex(start=start, periods=6, freq='min').tz_localize(tz)
+        >>> idx = pd.date_range(start=start, periods=6, freq='min').tz_localize(tz)
         >>> close_1 = [31.08, 31.10, 31.11, 31.07, 31.04, 31.04]
         >>> vol_1 = [10166, 69981, 14343, 10096, 11506, 9718]
         >>> d1 = pd.DataFrame(dict(price=close_1, volume=vol_1), index=idx)
@@ -180,7 +180,7 @@ def cat_data(data_kw):
     Examples:
         >>> start = '2018-09-10T10:10:00'
         >>> tz = 'Australia/Sydney'
-        >>> idx = pd.DatetimeIndex(start=start, periods=6, freq='min').tz_localize(tz)
+        >>> idx = pd.date_range(start=start, periods=6, freq='min').tz_localize(tz)
         >>> close_1 = [31.08, 31.10, 31.11, 31.07, 31.04, 31.04]
         >>> vol_1 = [10166, 69981, 14343, 10096, 11506, 9718]
         >>> d1 = pd.DataFrame(dict(price=close_1, volume=vol_1), index=idx)
