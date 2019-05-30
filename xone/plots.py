@@ -53,14 +53,16 @@ def plot_ts(
     is_day = diff.min() >= pd.Timedelta(days=1)
     num_days = dt_idx.size
 
-    if num_days >= 60:
-        # Monthly tickers
+    if num_days >= kwargs.pop('month_min_cnt', 90):
+        # Monthly ticks
         xticks = raw_idx.loc[raw_idx.dt.month.diff().ne(0)]
-    elif num_days >= 5:
+    elif num_days >= kwargs.pop('week_min_cnt', 15):
+        # Weekly ticks
         xticks = raw_idx.loc[raw_idx.dt.weekofyear.diff().ne(0)]
     elif is_day:
         xticks = raw_idx.index
     else:
+        # Daily ticks - to be improved
         xticks = raw_idx.loc[raw_idx.dt.day.diff().ne(0)]
 
     # Plot
