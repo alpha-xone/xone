@@ -29,9 +29,9 @@ def plot_ts(
             to_plot = data[fld]
 
     if isinstance(to_plot, pd.Series):
-        pl_val = pd.Series(data.values)
+        pl_val = pd.Series(data.values, name=data.name)
     else:
-        pl_val = pd.DataFrame(data.values)
+        pl_val = pd.DataFrame(data.values, columns=data.columns)
 
     # Proper raw datetime index
     idx = data.index
