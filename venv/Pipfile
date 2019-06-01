@@ -6,6 +6,8 @@ verify_ssl = true
 [dev-packages]
 ipykernel = "*"
 pytest = "*"
+pytest-cov = "*"
+coverage = "*"
 
 [packages]
 numpy = "*"
