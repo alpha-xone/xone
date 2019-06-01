@@ -1,4 +1,81 @@
+import pandas as pd
+
 from xone import utils
+from matplotlib import pyplot as plt
+
+
+def plot_ts(
+        data: (pd.Series, pd.DataFrame), fld='close',
+        tz=None, vline=None, **kwargs
+):
+    """
+    Time series data plots
+
+    Args:
+        data: data in pd.Series or pd.DataFrame
+        fld: which field to plot for multi-index
+        tz: tz info - applied to merged time series data
+        vline: kwargs for verticle lines
+
+    Returns:
+        matplotlib plot
+    """
+    to_plot = data
+    if isinstance(data, pd.DataFrame):
+        if isinstance(data.columns, pd.MultiIndex) and \
+                (fld in data.columns.get_level_values(1)):
+            to_plot = data.xs(fld, axis=1, level=1)
+        elif fld in data.columns:
+            to_plot = data[fld]
+
+    if isinstance(to_plot, pd.Series):
+        pl_val = pd.Series(data.values, name=data.name)
+    else:
+        pl_val = pd.DataFrame(data.values, columns=data.columns)
+
+    # Proper raw datetime index
+    idx = data.index
+    if isinstance(idx, pd.MultiIndex):
+        for n in range(len(idx.levels))[::-1]:
+            sidx = idx.get_level_values(n)
+            if isinstance(sidx, pd.DatetimeIndex):
+                idx = sidx
+                break
+
+    # Standardize timezone
+    assert isinstance(idx, pd.DatetimeIndex), idx
+    if tz is not None: idx = idx.tz_convert(tz)
+
+    raw_idx = idx.to_series(keep_tz=True).reset_index(drop=True)
+    dt_idx = pd.Series(raw_idx.dt.date.unique())
+    diff = raw_idx.diff()
+
+    is_day = diff.min() >= pd.Timedelta(days=1)
+    num_days = dt_idx.size
+
+    if num_days >= kwargs.pop('month_min_cnt', 90):
+        # Monthly ticks
+        xticks = raw_idx.loc[raw_idx.dt.month.diff().ne(0)]
+    elif num_days >= kwargs.pop('week_min_cnt', 15):
+        # Weekly ticks
+        xticks = raw_idx.loc[raw_idx.dt.weekofyear.diff().ne(0)]
+    elif is_day:
+        xticks = raw_idx.index
+    else:
+        # Daily ticks - to be improved
+        xticks = raw_idx.loc[raw_idx.dt.day.diff().ne(0)]
+
+    # Plot
+    ax = pl_val.plot(**kwargs)
+    plt.xticks(ticks=xticks.index.tolist(), labels=xticks.dt.date, rotation=30)
+
+    if not isinstance(vline, dict): vline = dict()
+    vline['color'] = vline.get('color', '#FFFFFF')
+    vline['linestyle'] = vline.get('linestyle', '-')
+    vline['linewidth'] = vline.get('linewidth', 1)
+    for xc in xticks: plt.axvline(x=xc, **vline)
+
+    return ax
 
 
 def plot_multi(data, cols=None, spacing=.06, color_map=None, plot_kw=None, **kwargs):
@@ -24,7 +101,6 @@ def plot_multi(data, cols=None, spacing=.06, color_map=None, plot_kw=None, **kwa
         >>> data = pd.DataFrame(dict(a=np.exp(idx), b=idx), index=idx)
         >>> # plot_multi(data=data, cols=['a', 'b'], plot_kw=[dict(style='.-'), dict()])
     """
-    import matplotlib.pyplot as plt
     from pandas import plotting
 
     if cols is None: cols = data.columns
@@ -33,7 +109,9 @@ def plot_multi(data, cols=None, spacing=.06, color_map=None, plot_kw=None, **kwa
     num_colors = len(utils.flatten(cols))
 
     # Get default color style from pandas
-    colors = getattr(getattr(plotting, '_style'), '_get_standard_colors')(num_colors=num_colors)
+    colors = getattr(
+        getattr(plotting, '_style'), '_get_standard_colors'
+    )(num_colors=num_colors)
     if color_map is None: color_map = dict()
 
     fig = plt.figure()
@@ -109,8 +187,6 @@ def plot_h(data, cols, wspace=.1, plot_kw=None, **kwargs):
         >>> data = pd.DataFrame(dict(a=np.exp(idx), b=idx), index=idx)
         >>> # plot_h(data=data, cols=['a', 'b'], wspace=.2, plot_kw=[dict(style='.-'), dict()])
     """
-    import matplotlib.pyplot as plt
-
     if plot_kw is None: plot_kw = [dict()] * len(cols)
 
     _, axes = plt.subplots(nrows=1, ncols=len(cols), **kwargs)
