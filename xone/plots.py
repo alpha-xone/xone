@@ -109,9 +109,11 @@ def plot_multi(data, cols=None, spacing=.06, color_map=None, plot_kw=None, **kwa
     num_colors = len(utils.flatten(cols))
 
     # Get default color style from pandas
-    colors = getattr(
-        getattr(plotting, '_style'), '_get_standard_colors'
-    )(num_colors=num_colors)
+    if hasattr(plotting, '_matplotlib'):
+        style = getattr(plotting, '_matplotlib').style
+    else:
+        style = getattr(plotting, '_style')
+    colors = getattr(style, '_get_standard_colors')(num_colors=num_colors)
     if color_map is None: color_map = dict()
 
     fig = plt.figure()
