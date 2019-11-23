@@ -197,3 +197,49 @@ def plot_h(data, cols, wspace=.1, plot_kw=None, **kwargs):
         data.loc[:, col].plot(ax=axes[n], **plot_kw[n])
 
     return axes
+
+
+def add_lines(
+        axes: plt.Axes, xs=None, ys=None, colors=None, **kwargs
+) -> plt.Axes:
+    """
+    Add horizontal or vertical lines to charts
+
+    Args:
+        axes: axes to add
+        xs: Xs
+        ys: Ys
+        colors: list of colors (Xs first then Ys if both given
+        **kwargs: kwargs to pass
+
+    Returns:
+        plt.Axes
+    """
+    idx = 0
+    if colors is None: colors = ['darkgreen', 'darkorange', 'darkred']
+
+    if xs is not None:
+        if isinstance(xs, str): xs = [xs]
+        if not hasattr(xs, '__iter__'): xs = [xs]
+        ylim = axes.get_ylim()
+        for x in xs:
+            axes.vlines(
+                x=x, ymin=ylim[0], ymax=ylim[1],
+                colors=colors[idx % len(colors)], **kwargs
+            )
+            idx = idx + 1
+        axes.set_ylim(ymin=ylim[0], ymax=ylim[1])
+
+    if ys is not None:
+        if isinstance(ys, str): ys = [ys]
+        if not hasattr(ys, '__iter__'): ys = [ys]
+        xlim = axes.get_xlim()
+        for y in ys:
+            axes.hlines(
+                y=y, xmin=xlim[0], xmax=xlim[1],
+                colors=colors[idx % len(colors)], **kwargs
+            )
+            idx = idx + 1
+        axes.set_xlim(xmin=xlim[0], xmax=xlim[1])
+
+    return axes
