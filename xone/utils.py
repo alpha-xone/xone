@@ -304,6 +304,51 @@ def to_frame(data_list, exc_cols=None, **kwargs):
     ).drop(columns=[] if exc_cols is None else exc_cols)
 
 
+def read_zip(zip_url: str, read_func, **kwargs) -> pd.DataFrame:
+    """
+    Read zip file, either from url or local
+
+    Args:
+        zip_url: URL or local address
+        read_func: function
+        **kwargs: key-word arguments passed to read_func
+
+    Returns:
+        pd.DataFrame
+
+    Examples:
+        >>> from xone.files import abspath
+        >>> test_folder = f'{abspath(__file__)}/tests/files'
+        >>> read_zip(
+        ...     zip_url=f'{test_folder}/ma100120.zip',
+        ...     read_func=pd.read_excel,
+        ...     skiprows=2
+        ... ).head()
+                                    Registrant Name File Number      CIK
+        0       30 Three Sixty Public Finance, Inc.   867-02350  1733578
+        1                  A. M. Miller & Co., Inc.   867-00872  1618730
+        2              A. M. Peche & Associates LLC   867-00111  1613201
+        3  A.BRIDGE REALVEST SECURITIES CORPORATION   867-01291  1005399
+        4              Acacia Financial Group, Inc.   867-00271  1613001
+    """
+    import tempfile
+    import zipfile
+    import urllib.parse
+    import urllib.request
+
+    data_list = []
+    info = urllib.parse.urlparse(zip_url)
+    is_url = len(info.scheme) > 1
+    with tempfile.TemporaryFile(mode='w+b') as tmp:
+        if is_url: tmp.write(urllib.request.urlopen(zip_url).read())
+        with zipfile.ZipFile(tmp if is_url else zip_url) as zf:
+            for f_name in zf.namelist():
+                with zf.open(f_name) as z:
+                    data_list.append(read_func(z, **kwargs))
+
+    return pd.DataFrame(pd.concat(data_list, sort=False))
+
+
 def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic', **kwargs):
     """
     Fit spline curve for given x, y values
