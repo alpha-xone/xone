@@ -6,6 +6,7 @@ from pandas.tseries import holiday
 
 class USTradingCalendar(holiday.AbstractHolidayCalendar):
 
+    # noinspection PyTypeChecker
     rules = [
         holiday.Holiday('NewYearsDay', month=1, day=1, observance=holiday.nearest_workday),
         holiday.USMartinLutherKingJr,
@@ -19,24 +20,33 @@ class USTradingCalendar(holiday.AbstractHolidayCalendar):
     ]
 
 
-def trading_dates(start, end, calendar='US'):
+def trading_dates(start, end, cal=None, **kwargs):
     """
     Trading dates for given exchange
 
     Args:
         start: start date
         end: end date
-        calendar: exchange as string
+        cal: exchange as string
 
     Returns:
         pd.DatetimeIndex: datetime index
 
     Examples:
-        >>> bus_dates = ['2018-12-24', '2018-12-26', '2018-12-27']
-        >>> trd_dates = trading_dates(start='2018-12-23', end='2018-12-27')
-        >>> assert len(trd_dates) == len(bus_dates)
-        >>> assert pd.Series(trd_dates == pd.DatetimeIndex(bus_dates)).all()
+        >>> b_dates = ['2018-12-24', '2018-12-26', '2018-12-27']
+        >>> t_dates = trading_dates(start='2018-12-23', end='2018-12-27', cal='US')
+        >>> assert len(t_dates) == len(b_dates)
+        >>> assert pd.Series(t_dates == pd.DatetimeIndex(b_dates)).all()
+        >>> bd_world = ['2020-12-24', '2020-12-25', '2020-12-28']
+        >>> td_world = trading_dates(start='2020-12-24', end='2020-12-28', cal=None)
+        >>> assert len(bd_world) == len(td_world)
     """
-    kw = dict(start=pd.Timestamp(start, tz='UTC').date(), end=pd.Timestamp(end, tz='UTC').date())
-    us_cal = getattr(sys.modules[__name__], f'{calendar}TradingCalendar')()
-    return pd.bdate_range(**kw).drop(us_cal.holidays(**kw))
+    def conv_dt(dt): return pd.Timestamp(dt, tz=kwargs.get('tz', 'UTC')).date()
+
+    kw = dict(start=conv_dt(start), end=conv_dt(end))
+    bus_dates = pd.bdate_range(**kw)
+    if isinstance(cal, str):
+        use_cal = getattr(sys.modules[__name__], f'{cal}TradingCalendar')()
+        return bus_dates.drop(use_cal.holidays(**kw))
+
+    return bus_dates

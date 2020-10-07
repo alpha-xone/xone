@@ -61,13 +61,13 @@ def trade_day(dt, cal='US'):
         pd.Timestamp: last trading day
 
     Examples:
-        >>> trade_day('2018-12-25').strftime('%Y-%m-%d')
+        >>> trade_day('2018-12-25', cal='US').strftime('%Y-%m-%d')
         '2018-12-24'
     """
     from xone import calendar
 
     dt = pd.Timestamp(dt).date()
-    return calendar.trading_dates(start=dt - pd.Timedelta('10D'), end=dt, calendar=cal)[-1]
+    return calendar.trading_dates(start=dt - pd.Timedelta('10D'), end=dt, cal=cal)[-1]
 
 
 def cur_time(typ='date', tz=DEFAULT_TZ, trading=True, cal='US'):
