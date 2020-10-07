@@ -77,9 +77,9 @@ def all_files(
     Examples:
         >>> test_folder = f'{abspath(__file__)}/tests/files'
         >>> all_files(test_folder, keyword='test', full_path=False)
-        ['test_2.json', 'test_1.json']
+        ['test_1.json', 'test_2.json']
         >>> all_files(test_folder, has_date=True, full_path=False)
-        ['dates_2019-01-02.yml', 'dates_2019-01-01.yml']
+        ['dates_2019-01-01.yml', 'dates_2019-01-02.yml']
     """
     if not os.path.exists(path=path_name): return []
     path_name = path_name.replace('\\', '/')
@@ -87,13 +87,13 @@ def all_files(
     if keyword or ext:
         keyword = f'*{keyword}*' if keyword else '*'
         if not ext: ext = '*'
-        files = sort_by_modified([
+        files = sorted([
             f.replace('\\', '/') for f in glob.iglob(f'{path_name}/{keyword}.{ext}')
             if os.path.isfile(f) and (f.replace('\\', '/').split('/')[-1][0] != '~')
         ])
 
     else:
-        files = sort_by_modified([
+        files = sorted([
             f'{path_name}/{f}' for f in os.listdir(path=path_name)
             if os.path.isfile(f'{path_name}/{f}') and (f[0] != '~')
         ])
@@ -136,13 +136,13 @@ def all_folders(
     path_name = path_name.replace('\\', '/')
 
     if keyword:
-        folders = sort_by_modified([
+        folders = sorted([
             f.replace('\\', '/') for f in glob.iglob(f'{path_name}/*{keyword}*')
             if os.path.isdir(f) and (f.replace('\\', '/').split('/')[-1][0] != '~')
         ])
 
     else:
-        folders = sort_by_modified([
+        folders = sorted([
             f'{path_name}/{f}' for f in os.listdir(path=path_name)
             if os.path.isdir(f'{path_name}/{f}') and (f[0] != '~')
         ])
