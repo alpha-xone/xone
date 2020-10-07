@@ -329,15 +329,15 @@ def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic', **kwargs
         >>> srs_x = pd.Series([1, 2, 3])
         >>> srs_y = pd.Series([np.exp(1), np.exp(2), np.exp(3)])
         >>> r = spline_curve(
-        >>>     x=srs_x, y=srs_y, step=.5,
-        >>>     val_min=3, val_max=18, fill_value='extrapolate'
-        >>> )
+        ...     x=srs_x, y=srs_y, step=.5, val_min=3,
+        ...     val_max=18, fill_value='extrapolate',
+        ... )
         >>> r.round(2).index.tolist()
         [1.0, 1.5, 2.0, 2.5, 3.0]
         >>> r.round(2).tolist()
         [3.0, 4.05, 7.39, 12.73, 18.0]
         >>> y_df = pd.DataFrame(dict(a=[np.exp(1), np.exp(2), np.exp(3)], b=[2, 3, 4]))
-        >>> r_df = spline_curve(x=x, y=y_df, step=.5, val_min=3, fill_value='extrapolate')
+        >>> r_df = spline_curve(srs_x, y_df, step=.5, val_min=3, fill_value='extrapolate')
         >>> r_df.round(2)
                  a    b
         1.00  3.00 3.00
