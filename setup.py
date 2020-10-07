@@ -53,7 +53,7 @@ if __name__ == '__main__':
         ],
         include_package_data=True,
         install_requires=[
-            str(getattr(ir, 'req', getattr(ir, 'requirement')))
+            str(getattr(ir, 'req' if hasattr(ir, 'req') else 'requirement'))
             for ir in parse_requirements(
                 f'{PACKAGE_ROOT}/requirements.txt', session='hack'
             )
