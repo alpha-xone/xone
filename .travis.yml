@@ -11,9 +11,7 @@ install:
   - sudo apt-get update
   - pip install --upgrade pip
   - pip install -r requirements.txt
-  - pip install pytest-cov
-  - pip install flake8
-  - pip install codecov
+  - pip install pytest pytest-cov coverage codecov flake8
   - python setup.py install
 
 script:
@@ -25,15 +23,3 @@ after_success:
   - cat .coverage
   - codecov --token=9debe549-7e1a-429f-b9a4-eed080032d59
 
-#deploy:
-#  provider: pypi
-#  user: alpha.xone
-#  password:
-#    secure: ""
-#  skip_existing: true
-#  on:
-#    tags: true
-#    distributions: sdist bdist_wheel
-#    repo: alpha.xone/xbbg
-#    branch: master
-#    condition: $TRAVIS_PYTHON_VERSION == 3.6
