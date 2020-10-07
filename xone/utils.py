@@ -319,17 +319,24 @@ def read_zip(zip_url: str, read_func, **kwargs) -> pd.DataFrame:
     Examples:
         >>> from xone.files import abspath
         >>> test_folder = f'{abspath(__file__)}/tests/files'
-        >>> read_zip(
-        ...     zip_url=f'{test_folder}/ma100120.zip',
-        ...     read_func=pd.read_excel,
-        ...     skiprows=2
-        ... ).head()
-                                    Registrant Name File Number      CIK
-        0       30 Three Sixty Public Finance, Inc.   867-02350  1733578
-        1                  A. M. Miller & Co., Inc.   867-00872  1618730
-        2              A. M. Peche & Associates LLC   867-00111  1613201
-        3  A.BRIDGE REALVEST SECURITIES CORPORATION   867-01291  1005399
-        4              Acacia Financial Group, Inc.   867-00271  1613001
+        >>> sample = read_zip(
+        ...     zip_url=f'{test_folder}/master.zip',
+        ...     read_func=pd.read_csv,
+        ...     skiprows=list(range(9)) + [10],
+        ...     sep='|',
+        ...     encoding='latin1',
+        ... )
+        >>> (
+        ...     sample[sample['Company Name'].str.startswith('BP')]
+        ...     .iloc[:, :-1]
+        ...     .reset_index(drop=True)
+        ... )
+               CIK                    Company Name Form Type  Date Filed
+        0  1167581          BP CAPITAL MARKETS PLC    25-NSE  2020-10-02
+        1  1167583  BP CAPITAL MARKETS AMERICA INC    25-NSE  2020-10-02
+        2  1798039              BPGIC HOLDINGS Ltd  SC 13D/A  2020-10-05
+        3   313807                          BP PLC       6-K  2020-10-05
+        4   850033    BP PRUDHOE BAY ROYALTY TRUST       8-K  2020-10-02
     """
     import tempfile
     import zipfile
