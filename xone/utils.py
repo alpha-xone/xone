@@ -204,11 +204,16 @@ def cat_data(data_kw):
                volume                   4,749.00                   6,762.00
     """
     if len(data_kw) == 0: return pd.DataFrame()
-    return pd.DataFrame(pd.concat([
-        data.assign(ticker=ticker).set_index('ticker', append=True)
-            .unstack('ticker').swaplevel(0, 1, axis=1)
-        for ticker, data in data_kw.items()
-    ], axis=1))
+    return pd.DataFrame(
+        pd.concat([
+            data
+            .assign(ticker=ticker)
+            .set_index('ticker', append=True)
+            .unstack('ticker')
+            .swaplevel(0, 1, axis=1)
+            for ticker, data in data_kw.items()
+        ], axis=1)
+    )
 
 
 def flatten(iterable, maps=None, unique=False):
@@ -290,8 +295,12 @@ def to_frame(data_list, exc_cols=None, **kwargs):
     """
     from collections import OrderedDict
 
+    # noinspection PyTypeChecker
     return pd.DataFrame(
-        pd.Series(data_list).apply(OrderedDict).tolist(), **kwargs
+        pd.Series(data_list)
+        .apply(OrderedDict)
+        .tolist(),
+        **kwargs
     ).drop(columns=[] if exc_cols is None else exc_cols)
 
 
@@ -317,9 +326,12 @@ def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic', **kwargs
         pd.Series: fitted curve
 
     Examples:
-        >>> x = pd.Series([1, 2, 3])
-        >>> y = pd.Series([np.exp(1), np.exp(2), np.exp(3)])
-        >>> r = spline_curve(x=x, y=y, step=.5, val_min=3, val_max=18, fill_value='extrapolate')
+        >>> srs_x = pd.Series([1, 2, 3])
+        >>> srs_y = pd.Series([np.exp(1), np.exp(2), np.exp(3)])
+        >>> r = spline_curve(
+        >>>     x=srs_x, y=srs_y, step=.5,
+        >>>     val_min=3, val_max=18, fill_value='extrapolate'
+        >>> )
         >>> r.round(2).index.tolist()
         [1.0, 1.5, 2.0, 2.5, 3.0]
         >>> r.round(2).tolist()
@@ -338,14 +350,24 @@ def spline_curve(x, y, step, val_min=0, val_max=None, kind='quadratic', **kwargs
     from collections import OrderedDict
 
     if isinstance(y, pd.DataFrame):
-        return pd.DataFrame(OrderedDict([(col, spline_curve(
-            x, y.loc[:, col], step=step, val_min=val_min, val_max=val_max, kind=kind
-        )) for col in y.columns]))
+        return pd.DataFrame(
+            OrderedDict([(col, spline_curve(
+                x=x, y=y.loc[:, col], step=step,
+                val_min=val_min, val_max=val_max, kind=kind,
+            )) for col in y.columns])
+        )
     fitted_curve = interp1d(x, y, kind=kind, **kwargs)
     new_x = np.arange(x.min(), x.max() + step / 2., step=step)
-    return pd.Series(
-        new_x, index=new_x, name=y.name if hasattr(y, 'name') else None
-    ).apply(fitted_curve).clip(val_min, val_max)
+    # noinspection PyTypeChecker
+    return (
+        pd.Series(
+            new_x,
+            index=new_x,
+            name=y.name if hasattr(y, 'name') else None
+        )
+        .apply(fitted_curve)
+        .clip(val_min, val_max)
+    )
 
 
 def func_scope(func):
@@ -429,8 +451,8 @@ def fstr(fmt, **kwargs):
         https://stackoverflow.com/a/4014070/1332656
 
     Examples:
-        >>> fmt = '{data_path}/{data_file}.parq'
-        >>> fstr(fmt, data_path='your/data/path', data_file='sample')
+        >>> use_fmt = '{data_path}/{data_file}.parq'
+        >>> fstr(fmt=use_fmt, data_path='your/data/path', data_file='sample')
         'your/data/path/sample.parq'
     """
     locals().update(kwargs)
@@ -502,7 +524,8 @@ def inst_repr(instance, fmt='str', public_only=True):
     """
     if not hasattr(instance, '__dict__'): return ''
 
-    if public_only: inst_dict = {k: v for k, v in instance.__dict__.items() if k[0] != '_'}
+    if public_only:
+        inst_dict = {k: v for k, v in instance.__dict__.items() if k[0] != '_'}
     else: inst_dict = instance.__dict__
 
     if fmt == 'json': return json.dumps(inst_dict, indent=2)

@@ -28,15 +28,9 @@ def cache_file(symbol, func, has_date, root, date_type='date'):
     cur_dt = utils.cur_time(typ=date_type, tz=data_tz, trading=False)
 
     if has_date:
-        if hasattr(cur_mod, 'FILE_WITH_DATE'):
-            file_fmt = getattr(cur_mod, 'FILE_WITH_DATE')
-        else:
-            file_fmt = '{root}/{typ}/{symbol}/{cur_dt}.parq'
+        file_fmt = getattr(cur_mod, 'FILE_WITH_DATE', '{root}/{typ}/{symbol}/{cur_dt}.parq')
     else:
-        if hasattr(cur_mod, 'FILE_NO_DATE'):
-            file_fmt = getattr(cur_mod, 'FILE_NO_DATE')
-        else:
-            file_fmt = '{root}/{typ}/{symbol}.parq'
+        file_fmt = getattr(cur_mod, 'FILE_NO_DATE', '{root}/{typ}/{symbol}.parq')
 
     return data_file(
         file_fmt=file_fmt, root=root, cur_dt=cur_dt, typ=func.__name__, symbol=symbol
@@ -67,7 +61,7 @@ def update_data(func):
         cur_mod = sys.modules[func.__module__]
         logger = logs.get_logger(name_or_func=f'{cur_mod.__name__}.{func.__name__}', types='stream')
 
-        root_path = cur_mod.DATA_PATH
+        root_path = getattr(cur_mod, 'DATA_PATH')
         date_type = kwargs.pop('date_type', 'date')
         save_static = kwargs.pop('save_static', True)
         save_dynamic = kwargs.pop('save_dynamic', True)
@@ -112,9 +106,9 @@ def save_data(data, file_fmt, append=False, drop_dups=None, info=None, **kwargs)
         **kwargs: additional parameters for f-strings
 
     Examples:
-        >>> data = pd.DataFrame([[1, 2], [3, 4]], columns=['a', 'b'])
+        >>> # sample = pd.DataFrame([[1, 2], [3, 4]], columns=['a', 'b'])
         >>> # save_data(
-        >>>     # data, '{ROOT}/daily/{typ}.parq',
+        >>>     # sample, '{ROOT}/daily/{typ}.parq',
         >>>     # ROOT='tests/data', typ='earnings'
         >>> # )
     """
