@@ -124,7 +124,7 @@ def load_file(data_file: str, **kwargs):
 
     logger.debug(f'Reading from {data_file} ...')
     act_func = LOAD_FUNC[ext]
-    return act_func(data_file, utils.func_kwarg(func=act_func, **kwargs))
+    return act_func(data_file, **utils.func_kwarg(func=act_func, **kwargs))
 
 
 def save_file(data, data_file: str, **kwargs):
@@ -142,4 +142,4 @@ def save_file(data, data_file: str, **kwargs):
     files.create_folder(data_file, is_file=True)
     logger.debug(f'Saving data to {data_file} ...')
     act_func = getattr(data, save_func)
-    act_func(data_file, utils.func_kwarg(func=act_func, **kwargs))
+    act_func(data_file, **utils.func_kwarg(func=act_func, **kwargs))
