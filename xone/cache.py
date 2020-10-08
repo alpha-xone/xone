@@ -65,6 +65,7 @@ def with_cache(*dec_args, **dec_kwargs):
             name_pattern = f'{root_path}/{file_name}'.replace('\\', '/')
             data_file = name_pattern.replace('[today]', cur_dt).replace('[date]', cur_dt)
 
+            # Reload data and override cache if necessary
             use_cache = not kwargs.get('_reload_', False)
 
             # Load data if exists
@@ -73,7 +74,12 @@ def with_cache(*dec_args, **dec_kwargs):
 
             # Load data if it was updated within update frequency
             elif update_freq and use_cache:
-                pattern = compile(name_pattern.replace('[', '{').replace(']', '}'))
+                pattern = compile(
+                    name_pattern
+                    .replace('[today]', '[date]')
+                    .replace('[', '{')
+                    .replace(']', '}')
+                )
                 cache_files = sorted(
                     filter(
                         lambda _: pattern.parse(_),
