@@ -355,7 +355,10 @@ def read_zip(zip_url: str, read_func, **kwargs) -> pd.DataFrame:
         with zipfile.ZipFile(tmp if is_url else zip_url) as zf:
             for f_name in zf.namelist():
                 with zf.open(f_name) as z:
-                    data_list.append(read_func(z, **kwargs))
+                    try:
+                        data_list.append(read_func(z, **kwargs))
+                    except Exception as e:
+                        print(e)
 
     return pd.DataFrame(pd.concat(data_list, sort=False))
 
@@ -378,6 +381,31 @@ def func_scope(func):
     """
     cur_mod = sys.modules[func.__module__]
     return f'{cur_mod.__name__}.{func.__name__}'
+
+
+def func_kwarg(func, **kwargs) -> dict:
+    """
+    Pass kwargs to function only if they are required
+
+    Args:
+        func: function
+
+    Returns:
+        dict
+
+    Examples:
+        >>> func_kwarg(func=read_zip, red=1)
+        {'red': 1}
+        >>> func_kwarg(func=func_scope, red=1)
+        {}
+    """
+    import inspect
+    if not callable(func): return {}
+
+    param = inspect.signature(func).parameters
+    kind = pd.Series({k: v.kind for k, v in param.items()})
+    if kind.max() == 4: return kwargs
+    else: return {k: v for k, v in kwargs.items() if k in kind}
 
 
 def format_float(digit=0, is_pct=False):

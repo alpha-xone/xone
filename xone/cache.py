@@ -47,11 +47,7 @@ def with_cache(*dec_args, **dec_kwargs):
                 k: args[n] if n < len(args) else v.default
                 for n, (k, v) in enumerate(param.items())
             }
-            param_kind = pd.Series({k: v.kind for k, v in param.items()})
-            if param_kind.max() == 4:
-                all_kw.update(kwargs)
-            else:
-                all_kw.update(**{k: v for k, v in kwargs.items() if k in param_kind})
+            all_kw.update(utils.func_kwarg(func=func, **kwargs))
             kwargs.update(all_kw)
 
             # Data path and file name
@@ -110,7 +106,10 @@ def target_file_name(fmt: str, **kwargs) -> str:
         >>> target_file_name('data/ticker={ticker}.pkl', ticker='RDS/A')
         'data/ticker=RDS_A.pkl'
     """
-    return utils.fstr(fmt=fmt, **{k: v.replace('/', '_') for k, v in kwargs.items()})
+    return utils.fstr(
+        fmt=fmt,
+        **{k: str(v).replace('/', '_') for k, v in kwargs.items()}
+    )
 
 
 def load_file(data_file: str, **kwargs):
@@ -124,14 +123,15 @@ def load_file(data_file: str, **kwargs):
     if ext not in LOAD_FUNC: return
 
     logger.debug(f'Reading from {data_file} ...')
-    return LOAD_FUNC[ext](data_file)
+    act_func = LOAD_FUNC[ext]
+    return act_func(data_file, utils.func_kwarg(func=act_func, **kwargs))
 
 
 def save_file(data, data_file: str, **kwargs):
     """
     Save data
     """
-    logger = logs.get_logger(save_file, level=kwargs.pop('log', 'info'))
+    logger = logs.get_logger(save_file, level=kwargs.get('log', 'info'))
     if not data_file: return
     ext = data_file.split('.')[-1]
     if ext in ['csv', 'xls', 'xlsx']: kwargs['index'] = False
@@ -141,14 +141,5 @@ def save_file(data, data_file: str, **kwargs):
 
     files.create_folder(data_file, is_file=True)
     logger.debug(f'Saving data to {data_file} ...')
-    getattr(data, save_func)(data_file, **kwargs)
-
-
-@with_cache(data_path='H:/Data/Sec', update_freq='1D')
-def get_tickers() -> pd.DataFrame:
-    return pd.read_json('https://www.sec.gov/files/company_tickers.json').transpose()
-
-
-if __name__ == '__main__':
-
-    t = get_tickers(log='debug')
+    act_func = getattr(data, save_func)
+    act_func(data_file, utils.func_kwarg(func=act_func, **kwargs))
