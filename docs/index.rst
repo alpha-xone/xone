@@ -1,16 +1,9 @@
 x1
 ==
 
-============== ======================
-Latest Release |pypi|
-\              |version|
-Docs           |docs|
-Build          |travis|
-Coverage       |codecov|
-Quality        |codacy|
-\              |codeFactor|
-License        |license|
-============== ======================
+|pypi| |version|
+
+|coffee|
 
 Frequently used functions for financial data analysis
 
@@ -128,6 +121,15 @@ for the target folder.
    In[20]: files.create_folder(data_file, is_file=True)
    In[21]: sample.to_parquet(data_file)
 
+============== ======================
+Docs           |docs|
+Build          |travis|
+Coverage       |codecov|
+Quality        |codacy|
+\              |codeFactor|
+License        |license|
+============== ======================
+
 .. |pypi| image:: https://img.shields.io/pypi/v/xone.svg
     :target: https://badge.fury.io/py/xone
 .. |version| image:: https://img.shields.io/pypi/pyversions/xone.svg
@@ -148,3 +150,5 @@ for the target folder.
 .. |license| image:: https://img.shields.io/github/license/alpha-xone/xone.svg
     :alt: GitHub license
     :target: https://github.com/alpha-xone/xone/blob/master/LICENSE
+.. |coffee| image:: https://www.buymeacoffee.com/assets/img/custom_images/purple_img.png
+   :target: https://www.buymeacoffee.com/Lntx29Oof
