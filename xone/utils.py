@@ -7,6 +7,10 @@ import pytz
 import inspect
 import sys
 
+from xone import __version__
+
+__all__ = ['__version__']
+
 DEFAULT_TZ = pytz.FixedOffset(-time.timezone / 60)
 
 
