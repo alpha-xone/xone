@@ -36,6 +36,11 @@ def with_cache(*dec_args, **dec_kwargs):
     # Update frequency - in pd.Timedelta - determines how frequent data should be updated
     update_freq = dec_kwargs.get('update_freq', None)
 
+    # Data loading / saving functions
+    # For saving, function has to have `data` and `data_file` as argument
+    load_func = dec_kwargs.get('load_func', None)
+    save_func = dec_kwargs.get('save_func', None)
+
     def decorator(func):
 
         @wraps(func)
@@ -62,7 +67,7 @@ def with_cache(*dec_args, **dec_kwargs):
 
             # Load data if exists
             if files.exists(data_file):
-                return load_file(data_file=data_file, **kwargs)
+                return load_file(data_file=data_file, load_func=load_func, **kwargs)
 
             # Load data if it was updated within update frequency
             elif update_freq:
@@ -83,8 +88,9 @@ def with_cache(*dec_args, **dec_kwargs):
 
             # Retrieve data
             data = func(**all_kw)
+
             # Save data to cache
-            save_file(data=data, data_file=data_file, **kwargs)
+            save_file(data=data, data_file=data_file, save_func=save_func, **kwargs)
 
             return data
         return wrapper
@@ -112,34 +118,41 @@ def target_file_name(fmt: str, **kwargs) -> str:
     )
 
 
-def load_file(data_file: str, **kwargs):
+def load_file(data_file: str, load_func=None, **kwargs):
     """
     Load data from cache
     """
     logger = logs.get_logger(load_file, level=kwargs.get('log', 'info'))
     if (not data_file) or (not files.exists(data_file)): return
 
+    if callable(load_func): return load_func(data_file)
+
     ext = data_file.split('.')[-1]
     if ext not in LOAD_FUNC: return
 
     logger.debug(f'Reading from {data_file} ...')
-    act_func = LOAD_FUNC[ext]
-    return act_func(data_file, **utils.func_kwarg(func=act_func, **kwargs))
+    return LOAD_FUNC[ext](data_file)
 
 
-def save_file(data, data_file: str, **kwargs):
+def save_file(data, data_file: str, save_func=None, **kwargs):
     """
     Save data
     """
     logger = logs.get_logger(save_file, level=kwargs.get('log', 'info'))
     if not data_file: return
+    if isinstance(data, (pd.Series, pd.DataFrame)) and data.empty: return
+
+    files.create_folder(data_file, is_file=True)
+    if callable(save_func):
+        logger.debug(f'Saving data to {data_file} ...')
+        save_func(data=data, data_file=data_file)
+
     ext = data_file.split('.')[-1]
-    if ext in ['csv', 'xls', 'xlsx']: kwargs['index'] = False
+    save_kw = {}
+    if ext in ['csv', 'xls', 'xlsx']: save_kw['index'] = False
 
     save_func = SAVE_FUNC.get(ext, '__nothing__')
     if not hasattr(data, save_func): return
 
-    files.create_folder(data_file, is_file=True)
     logger.debug(f'Saving data to {data_file} ...')
-    act_func = getattr(data, save_func)
-    act_func(data_file, **utils.func_kwarg(func=act_func, **kwargs))
+    getattr(data, save_func)(data_file, **save_kw)
