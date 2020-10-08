@@ -5,7 +5,7 @@ import sys
 import inspect
 
 from functools import wraps
-from parse import parse, compile
+from parse import compile
 from xone import utils, files, logs
 
 LOAD_FUNC = {
@@ -61,18 +61,16 @@ def with_cache(*dec_args, **dec_kwargs):
             file_name = target_file_name(fmt=file_fmt, **all_kw) \
                 if file_fmt else f'{func.__name__}/[date].pkl'
 
-            data_file = (
-                f'{root_path}/{file_name}'
-                .replace('\\', '/')
-                .replace('[today]', cur_dt)
-                .replace('[date]', cur_dt)
-            )
+            name_pattern = f'{root_path}/{file_name}'.replace('\\', '/')
+            data_file = name_pattern.replace('[today]', cur_dt).replace('[date]', cur_dt)
 
             # Load data if exists
             if files.exists(data_file):
                 return load_file(data_file=data_file, **kwargs)
+
+            # Load data if it was updated within update frequency
             elif update_freq:
-                pattern = compile(data_file.replace('[', '{').replace(']', '}'))
+                pattern = compile(name_pattern.replace('[', '{').replace(']', '}'))
                 cache_files = sorted(
                     filter(
                         lambda _: pattern.parse(_),
@@ -144,3 +142,13 @@ def save_file(data, data_file: str, **kwargs):
     files.create_folder(data_file, is_file=True)
     logger.debug(f'Saving data to {data_file} ...')
     getattr(data, save_func)(data_file, **kwargs)
+
+
+@with_cache(data_path='H:/Data/Sec', update_freq='1D')
+def get_tickers() -> pd.DataFrame:
+    return pd.read_json('https://www.sec.gov/files/company_tickers.json').transpose()
+
+
+if __name__ == '__main__':
+
+    t = get_tickers(log='debug')
