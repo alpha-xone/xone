@@ -122,12 +122,12 @@ def all_folders(
 
     Examples:
         >>> target_folder = f'{abspath(__file__)}/tests/folders'
-        >>> for f in sorted(all_folders(target_folder, keyword='test')):
-        ...     print(f.split('/')[-1])
+        >>> for fld in sorted(all_folders(target_folder, keyword='test')):
+        ...     print(fld.split('/')[-1])
         test_1
         test_2
-        >>> for f in sorted(all_folders(target_folder, has_date=True)):
-        ...     print(f.split('/')[-1])
+        >>> for fld in sorted(all_folders(target_folder, has_date=True)):
+        ...     print(fld.split('/')[-1])
         dates_2019-01-01
         dates_2019-01-02_labeled
         dates_2019-01-03
@@ -236,4 +236,4 @@ def file_modified_time(file_name) -> pd.Timestamp:
     Returns:
         pd.Timestamp
     """
-    return pd.to_datetime(time.ctime(os.path.getmtime(file_name)))
+    return pd.Timestamp(pd.to_datetime(time.ctime(os.path.getmtime(file_name))))
