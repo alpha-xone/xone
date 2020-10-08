@@ -65,12 +65,14 @@ def with_cache(*dec_args, **dec_kwargs):
             name_pattern = f'{root_path}/{file_name}'.replace('\\', '/')
             data_file = name_pattern.replace('[today]', cur_dt).replace('[date]', cur_dt)
 
+            use_cache = not kwargs.get('_reload_', False)
+
             # Load data if exists
-            if files.exists(data_file):
+            if files.exists(data_file) and use_cache:
                 return load_file(data_file=data_file, load_func=load_func, **kwargs)
 
             # Load data if it was updated within update frequency
-            elif update_freq:
+            elif update_freq and use_cache:
                 pattern = compile(name_pattern.replace('[', '{').replace(']', '}'))
                 cache_files = sorted(
                     filter(
