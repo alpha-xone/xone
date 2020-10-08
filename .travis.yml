@@ -4,6 +4,7 @@ matrix:
   include:
     - python: "3.6"
     - python: "3.7"
+    - python: "3.8"
       dist: xenial
       sudo: true
 
@@ -22,4 +23,3 @@ after_success:
   - coverage report
   - cat .coverage
   - codecov --token=9debe549-7e1a-429f-b9a4-eed080032d59
-
