@@ -40,6 +40,7 @@ def with_cache(*dec_args, **dec_kwargs):
     # For saving, function has to have `data` and `data_file` as argument
     load_func = dec_kwargs.get('load_func', None)
     save_func = dec_kwargs.get('save_func', None)
+    file_func = dec_kwargs.get('file_func', None)
 
     def decorator(func):
 
@@ -62,8 +63,12 @@ def with_cache(*dec_args, **dec_kwargs):
             file_name = target_file_name(fmt=file_fmt, **all_kw) \
                 if file_fmt else f'{func.__name__}/[date].pkl'
 
-            name_pattern = f'{root_path}/{file_name}'.replace('\\', '/')
-            data_file = name_pattern.replace('[today]', cur_dt).replace('[date]', cur_dt)
+            if callable(file_func):
+                name_pattern = ''
+                data_file = f'{root_path}/{file_func(**kwargs)}'
+            else:
+                name_pattern = f'{root_path}/{file_name}'.replace('\\', '/')
+                data_file = name_pattern.replace('[today]', cur_dt).replace('[date]', cur_dt)
 
             # Reload data and override cache if necessary
             use_cache = not kwargs.get('_reload_', False)
