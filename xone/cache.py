@@ -124,7 +124,7 @@ def target_file_name(fmt: str, **kwargs) -> str:
     Examples:
         >>> target_file_name('data/ticker={ticker}.pkl', ticker='RDS/A')
         'data/ticker=RDS_A.pkl'
-        >>> target_file_name('data/{corp}', ticker='E*TRADE FUTURES LLC')
+        >>> target_file_name('data/{corp}', corp='E*TRADE FUTURES LLC')
         'data/E@TRADE FUTURES LLC'
     """
     return utils.fstr(
