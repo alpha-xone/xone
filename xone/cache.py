@@ -78,7 +78,7 @@ def with_cache(*dec_args, **dec_kwargs):
                 return load_file(data_file=data_file, load_func=load_func, **kwargs)
 
             # Load data if it was updated within update frequency
-            elif update_freq and use_cache:
+            if update_freq and use_cache:
                 pattern = compile(
                     name_pattern
                     .replace('[today]', '[date]')
@@ -87,7 +87,7 @@ def with_cache(*dec_args, **dec_kwargs):
                 )
                 cache_files = sorted(
                     filter(
-                        lambda _: pattern.parse(_),
+                        pattern.parse,
                         files.all_files('/'.join(data_file.split('/')[:-1]))
                     ),
                     key=os.path.getmtime,

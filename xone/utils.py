@@ -105,8 +105,9 @@ def cur_time(typ='date', tz=DEFAULT_TZ, trading=True, cal='US'):
     dt = pd.Timestamp('now', tz=tz)
 
     if typ == 'date':
-        if trading: return trade_day(dt=dt, cal=cal).strftime('%Y-%m-%d')
-        else: return dt.strftime('%Y-%m-%d')
+        if trading:
+            return trade_day(dt=dt, cal=cal).strftime('%Y-%m-%d')
+        return dt.strftime('%Y-%m-%d')
 
     if typ == 'time': return dt.strftime('%Y-%m-%d %H:%M:%S')
     if typ == 'time_path': return dt.strftime('%Y-%m-%d/%H-%M-%S')
@@ -399,13 +400,12 @@ def func_kwarg(func, **kwargs) -> dict:
         >>> func_kwarg(func=func_scope, red=1)
         {}
     """
-    import inspect
     if not callable(func): return {}
 
     param = inspect.signature(func).parameters
     kind = pd.Series({k: v.kind for k, v in param.items()})
     if kind.max() == 4: return kwargs
-    else: return {k: v for k, v in kwargs.items() if k in kind}
+    return {k: v for k, v in kwargs.items() if k in kind}
 
 
 def format_float(digit=0, is_pct=False):
@@ -436,10 +436,9 @@ def format_float(digit=0, is_pct=False):
         fmt = f'{{:{space}.{abs(int(digit))}%}}'
         return lambda vv: 'NaN' if np.isnan(vv) else fmt.format(vv)
 
-    else:
-        return lambda vv: 'NaN' if np.isnan(vv) else (
-            f'{{:,.{digit}f}}'.format(vv) if vv else '-' + ' ' * abs(digit)
-        )
+    return lambda vv: 'NaN' if np.isnan(vv) else (
+        f'{{:,.{digit}f}}'.format(vv) if vv else '-' + ' ' * abs(digit)
+    )
 
 
 class FString(object):
@@ -547,7 +546,7 @@ def inst_repr(instance, fmt='str', public_only=True):
     else: inst_dict = instance.__dict__
 
     if fmt == 'json': return json.dumps(inst_dict, indent=2)
-    elif fmt == 'str': return to_str(inst_dict, public_only=public_only)
+    if fmt == 'str': return to_str(inst_dict, public_only=public_only)
 
     return ''
 
