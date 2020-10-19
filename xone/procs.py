@@ -8,7 +8,10 @@ try:
     import win32process
     import win32api
 except ImportError:
-    sys.exit()
+    import pytest
+
+    pytest.skip()
+    sys.exit(1)
 
 
 def run(func, keys, max_procs=None, show_proc=False, affinity=None, **kwargs):
