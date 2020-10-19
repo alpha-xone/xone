@@ -4,8 +4,11 @@ import queue
 from multiprocessing import Process, cpu_count
 from itertools import product
 
-import win32process
-import win32api
+try:
+    import win32process
+    import win32api
+except:
+    sys.exit()
 
 
 def run(func, keys, max_procs=None, show_proc=False, affinity=None, **kwargs):
