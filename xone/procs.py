@@ -7,7 +7,7 @@ from itertools import product
 try:
     import win32process
     import win32api
-except:
+except ImportError:
     sys.exit()
 
 
