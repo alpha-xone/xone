@@ -1,11 +1,13 @@
 import pandas as pd
 
 import os
-import re
 import glob
 import time
 
-DATE_FMT = r'\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])'
+# Default datetime format:
+#   ISO 8601 format date/time
+#   e.g. 1972-01-20T10:21:36Z (“T” and “Z” optional)
+DATE_FMT = '{dt:ti}'
 
 
 def exists(path) -> bool:
@@ -184,11 +186,10 @@ def filter_by_dates(files_or_folders: list, date_fmt=DATE_FMT) -> list:
         ... ])
         ['t1/dts_2019-01-01', 't2/dts_2019-01-02']
     """
-    r = re.compile(f'.*{date_fmt}.*')
-    return list(filter(
-        lambda vv: r.match(vv.replace('\\', '/').split('/')[-1]) is not None,
-        files_or_folders,
-    ))
+    from parse import compile
+
+    p = compile(date_fmt)
+    return list(filter(p.search, files_or_folders))
 
 
 def latest_file(path_name, keyword='', ext='', **kwargs) -> str:
