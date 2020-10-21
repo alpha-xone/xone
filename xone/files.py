@@ -189,7 +189,10 @@ def filter_by_dates(files_or_folders: list, date_fmt=DATE_FMT) -> list:
     from parse import compile
 
     p = compile(date_fmt)
-    return list(filter(p.search, files_or_folders))
+    return list(filter(
+        lambda _: p.search(str(_).replace('\\', '/').split('/')[-1]),
+        files_or_folders
+    ))
 
 
 def latest_file(path_name, keyword='', ext='', **kwargs) -> str:
