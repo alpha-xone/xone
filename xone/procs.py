@@ -68,13 +68,15 @@ def saturate_kwargs(keys, **kwargs) -> list:
     Examples:
         >>> saturate_kwargs('k1', k1=range(2), k2=range(2))
         [{'k1': 0, 'k2': range(0, 2)}, {'k1': 1, 'k2': range(0, 2)}]
-        >>> saturate_kwargs(['k1', 'k2'], k1=range(3), k2=range(2), k3=range(4))
-        [{'k1': 0, 'k2': 0, 'k3': range(0, 4)},
-         {'k1': 0, 'k2': 1, 'k3': range(0, 4)},
-         {'k1': 1, 'k2': 0, 'k3': range(0, 4)},
-         {'k1': 1, 'k2': 1, 'k3': range(0, 4)},
-         {'k1': 2, 'k2': 0, 'k3': range(0, 4)},
-         {'k1': 2, 'k2': 1, 'k3': range(0, 4)}]
+        >>> kw = saturate_kwargs(
+        ...     keys=['k1', 'k2'], k1=range(3), k2=range(2), k3=range(4)
+        ... )
+        >>> kw[:2]
+        [{'k1': 0, 'k2': 0, 'k3': range(0, 4)}, {'k1': 0, 'k2': 1, 'k3': range(0, 4)}]
+        >>> kw[2:4]
+        [{'k1': 1, 'k2': 0, 'k3': range(0, 4)}, {'k1': 1, 'k2': 1, 'k3': range(0, 4)}]
+        >>> kw[4:6]
+        [{'k1': 2, 'k2': 0, 'k3': range(0, 4)}, {'k1': 2, 'k2': 1, 'k3': range(0, 4)}]
         >>> saturate_kwargs('k', k1=range(5), k2=range(2))
         []
     """
