@@ -2,7 +2,7 @@ import sqlite3
 import json
 
 WAL_MODE = 'PRAGMA journal_mode=WAL'
-ALL_TABLES = 'SELECT name FROM sqlite_schema WHERE type="table"'
+ALL_TABLES = 'SELECT name FROM sqlite_master WHERE type="table"'
 
 
 class Singleton(type):
@@ -34,9 +34,9 @@ class SQLite(metaclass=Singleton):
         >>> db_ = SQLite(db_file_)
         >>> db_.tables()
         ['xone']
-        >>> db_.select(table='xone')
-        []
         >>> db_.replace_into(table='xone', rowid=1)
+        >>> db_.select(table='xone')
+        [(1,)]
     """
 
     def __init__(self, db_file, keep_live=False):
