@@ -108,7 +108,9 @@ def db_value(val) -> str:
     """
     Database value as in query string
     """
-    return f'"{val}"' if isinstance(val, str) else str(val)
+    if isinstance(val, str):
+        return json.dumps(val.replace('\"', '').strip())
+    return json.dumps(val)
 
 
 def select(table: str, **kwargs) -> str:
