@@ -4,10 +4,11 @@ import queue
 from multiprocessing import Process, cpu_count
 from itertools import product
 
+from tqdm import tqdm
 from xone import logs
 
 
-def run(func, keys, max_procs=None, show_proc=False, affinity=None, **kwargs):
+def run(func, keys, max_procs=None, affinity=None, **kwargs):
     """
     Provide interface for multiprocessing
 
@@ -15,7 +16,6 @@ def run(func, keys, max_procs=None, show_proc=False, affinity=None, **kwargs):
         func: callable functions
         keys: keys in kwargs that want to use process
         max_procs: max number of processes
-        show_proc: whether to show process
         affinity: CPU affinity
         **kwargs: kwargs for func
     """
@@ -38,20 +38,19 @@ def run(func, keys, max_procs=None, show_proc=False, affinity=None, **kwargs):
             logger.error(str(e))
 
     task_queue = queue.Queue()
-    while len(kw_arr) > 0:
-        for _ in range(max_procs):
-            if len(kw_arr) == 0: break
-            kw = kw_arr.pop(0)
-            p = Process(target=func, kwargs=kw)
-            p.start()
-            sys.stdout.flush()
-            task_queue.put(p)
-            if show_proc:
-                signature = ', '.join([f'{k}={v}' for k, v in kw.items()])
-                logger.info(f'[{func.__name__}] ({signature})')
-        while not task_queue.empty():
-            p = task_queue.get()
-            p.join()
+    with tqdm(total=len(kw_arr)) as bar:
+        while len(kw_arr) > 0:
+            for _ in range(max_procs):
+                if len(kw_arr) == 0: break
+                kw = kw_arr.pop(0)
+                bar.update()
+                p = Process(target=func, kwargs=kw)
+                p.start()
+                sys.stdout.flush()
+                task_queue.put(p)
+            while not task_queue.empty():
+                p = task_queue.get()
+                p.join()
 
 
 def saturate_kwargs(keys, **kwargs) -> list:
