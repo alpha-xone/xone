@@ -1,3 +1,5 @@
+import pandas as pd
+
 import sqlite3
 import json
 
@@ -36,7 +38,8 @@ class SQLite(metaclass=Singleton):
         ['xone']
         >>> db_.replace_into(table='xone', rowid=1)
         >>> db_.select(table='xone')
-        [(1,)]
+           rowid
+        0      1
     """
 
     def __init__(self, db_file, keep_live=False):
@@ -54,14 +57,19 @@ class SQLite(metaclass=Singleton):
         if not keep_live: self.close()
         return [r[0] for r in res]
 
-    def select(self, table: str, **kwargs) -> list:
+    def select(self, table: str, **kwargs) -> pd.DataFrame:
         """
         SELECT query
         """
         keep_live = self.is_live
-        res = self.con.execute(select(table=table, **kwargs)).fetchall()
+        data = self.con.execute(select(table=table, **kwargs)).fetchall()
+        cols = [
+            info[1] for info in (
+                self.con.execute(f'PRAGMA table_info({table})').fetchall()
+            )
+        ]
         if not keep_live: self.close()
-        return res
+        return pd.DataFrame(data, columns=cols)
 
     def replace_into(self, table: str, **kwargs):
         """
