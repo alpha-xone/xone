@@ -408,6 +408,43 @@ def func_kwarg(func, **kwargs) -> dict:
     return {k: v for k, v in kwargs.items() if k in kind}
 
 
+def perf(data: (pd.DataFrame, pd.Series)) -> (pd.DataFrame, pd.Series):
+    """
+    Price performance based at 100
+
+    Args:
+        data: price series or dataframe
+
+    Returns:
+        pd.DataFrame or pd.Series
+
+    Examples:
+        >>> (
+        ...     pd.DataFrame({
+        ...         'P1': [1, 1.03, 1.02, 1.06],
+        ...         'P2': [1, .99, .97, .97],
+        ...     })
+        ...     .pipe(perf)
+        ... )
+              P1     P2
+        0 100.00 100.00
+        1 103.00  99.00
+        2 102.00  97.00
+        3 106.00  97.00
+    """
+    if isinstance(data, pd.Series):
+        return (
+            data
+            .dropna()
+            .pct_change()
+            .fillna(0)
+            .add(1)
+            .cumprod()
+            .mul(100)
+        )
+    return data.apply(perf, axis=0)
+
+
 def format_float(digit=0, is_pct=False):
     """
     Number display format for pandas
