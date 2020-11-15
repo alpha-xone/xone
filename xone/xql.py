@@ -67,6 +67,39 @@ class SQLite(metaclass=Singleton):
         if not keep_live: self.close()
         return pd.DataFrame(data, columns=self.columns(table=table))
 
+    def select_recent(
+            self,
+            table: str,
+            dateperiod: str,
+            date_col: str = 'modified_date',
+            cond='',
+            **kwargs
+    ) -> pd.DataFrame:
+        """
+        Select recent
+
+        Args:
+            table: table name
+            dateperiod: time period, e.g., 1M, 1Q, etc.
+            date_col: column for time period
+            cond: conditions
+            **kwargs: other select criteria
+
+        Returns:
+            pd.DataFrame
+        """
+        cols = self.columns(table=table)
+        if date_col not in cols: return pd.DataFrame()
+        start_dt = (
+            pd.date_range(
+                end='today', freq=dateperiod, periods=2, normalize=True,
+            )[0]
+            .strftime('%Y-%m-%d')
+        )
+        dt_cond = f'{date_col} >= "{start_dt}"'
+        if cond: dt_cond = f'{dt_cond} AND {cond}'
+        return self.select(table=table, cond=dt_cond, **kwargs)
+
     def columns(self, table: str):
         """
         Table columns
