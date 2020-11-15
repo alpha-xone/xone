@@ -8,7 +8,7 @@ from tqdm import tqdm
 from xone import logs
 
 
-def run(func, keys, max_procs=None, affinity=None, **kwargs):
+def run(func, keys, max_procs=None, affinity=None, proc_desc='', **kwargs):
     """
     Provide interface for multiprocessing
 
@@ -17,6 +17,7 @@ def run(func, keys, max_procs=None, affinity=None, **kwargs):
         keys: keys in kwargs that want to use process
         max_procs: max number of processes
         affinity: CPU affinity
+        proc_desc: prefix for progressbar
         **kwargs: kwargs for func
     """
     logger = logs.get_logger(run, level=kwargs.get('log', 'info'))
@@ -38,7 +39,7 @@ def run(func, keys, max_procs=None, affinity=None, **kwargs):
             logger.error(str(e))
 
     task_queue = queue.Queue()
-    with tqdm(total=len(kw_arr)) as bar:
+    with tqdm(total=len(kw_arr), desc=proc_desc) as bar:
         while len(kw_arr) > 0:
             for _ in range(max_procs):
                 if len(kw_arr) == 0: break
