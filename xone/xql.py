@@ -96,9 +96,11 @@ class SQLite(metaclass=Singleton):
             )[0]
             .strftime('%Y-%m-%d')
         )
-        dt_cond = f'{date_col} >= "{start_dt}"'
-        if cond: dt_cond = f'{dt_cond} AND {cond}'
-        return self.select(table=table, cond=dt_cond, **kwargs)
+        return (
+            self.select(table=table, cond=cond, **kwargs)
+            .query(f'{date_col} >= {start_dt}')
+            .reset_index(drop=True)
+        )
 
     def columns(self, table: str):
         """
