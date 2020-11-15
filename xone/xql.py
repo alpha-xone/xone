@@ -193,6 +193,9 @@ def select(table: str, cond='', **kwargs) -> str:
         >>> q2 = select('daily', cond='price > 3000', ticker='ES1 Index')
         >>> q2.splitlines()[-2].strip()
         'price > 3000 AND ticker="ES1 Index"'
+        >>> q3 = select('daily', cond='price > 3000')
+        >>> q3.splitlines()[-2].strip()
+        'price > 3000'
         >>> select('daily')
         'SELECT * FROM daily'
     """
@@ -202,7 +205,7 @@ def select(table: str, cond='', **kwargs) -> str:
     ]
     where = ' AND '.join(filter(bool, all_cond))
     s = f'SELECT * FROM {table}'
-    if kwargs:
+    if where:
         return f"""
             {s}
             WHERE
