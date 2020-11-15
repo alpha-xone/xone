@@ -57,26 +57,47 @@ class SQLite(metaclass=Singleton):
         if not keep_live: self.close()
         return [r[0] for r in res]
 
-    def select(self, table: str, **kwargs) -> pd.DataFrame:
+    def select(self, table: str, cond='', **kwargs) -> pd.DataFrame:
         """
         SELECT query
         """
         keep_live = self.is_live
-        data = self.con.execute(select(table=table, **kwargs)).fetchall()
-        cols = [
+        q_str = select(table=table, cond=cond, **kwargs)
+        data = self.con.execute(q_str).fetchall()
+        if not keep_live: self.close()
+        return pd.DataFrame(data, columns=self.columns(table=table))
+
+    def columns(self, table: str):
+        """
+        Table columns
+        """
+        return [
             info[1] for info in (
                 self.con.execute(f'PRAGMA table_info({table})').fetchall()
             )
         ]
-        if not keep_live: self.close()
-        return pd.DataFrame(data, columns=cols)
 
-    def replace_into(self, table: str, **kwargs):
+    def replace_into(self, table: str, data: pd.DataFrame = None, **kwargs):
         """
-        REPLACE INTO
+        Replace records into table
+
+        Args:
+            table: table name
+            data: DataFrame - if given, **kwargs will be ignored
+            **kwargs: record values
         """
-        keep_live = self.is_live
-        self.con.execute(replace_into(table=table, **kwargs))
+        if isinstance(data, pd.DataFrame):
+            keep_live = self.is_live
+            # noinspection PyTypeChecker
+            data.apply(
+                lambda row: self.replace_into(table=table, _live_=True, **row),
+                axis=1
+            )
+        else:
+            keep_live = self.is_live or kwargs.get('_live_', False)
+            self.con.execute(replace_into(table=table, **{
+                k: v for k, v in kwargs.items() if k != '_live_'
+            }))
         if not keep_live: self.close()
 
     @property
@@ -121,25 +142,30 @@ def db_value(val) -> str:
     return json.dumps(val)
 
 
-def select(table: str, **kwargs) -> str:
+def select(table: str, cond='', **kwargs) -> str:
     """
     Query string of SELECT statement
 
     Args:
         table: table name
+        cond: conditions
         **kwargs: data as kwargs
 
     Examples:
-        >>> query = select('daily', ticker='ES1 Index', price=3000)
-        >>> query.splitlines()[-2].strip()
+        >>> q1 = select('daily', ticker='ES1 Index', price=3000)
+        >>> q1.splitlines()[-2].strip()
         'ticker="ES1 Index" AND price=3000'
+        >>> q2 = select('daily', cond='price > 3000', ticker='ES1 Index')
+        >>> q2.splitlines()[-2].strip()
+        'price > 3000 AND ticker="ES1 Index"'
         >>> select('daily')
         'SELECT * FROM daily'
     """
-    where = ' AND '.join(
+    all_cond = [cond] + [
         f'{key}={db_value(value)}'
         for key, value in kwargs.items()
-    )
+    ]
+    where = ' AND '.join(filter(bool, all_cond))
     s = f'SELECT * FROM {table}'
     if kwargs:
         return f"""
