@@ -83,7 +83,7 @@ def with_cache(*dec_args, **dec_kwargs):
                     f'{root_path}/{file_name}'.replace('\\', '/')
                     .replace('[today]', '[date]')
                 )
-                data_file = name_pattern.replace('[today]', cur_dt)
+                data_file = name_pattern.replace('[date]', cur_dt)
 
             # Reload data and override cache if necessary
             use_cache = not kwargs.get('_reload_', False)
@@ -98,7 +98,7 @@ def with_cache(*dec_args, **dec_kwargs):
                 for dt in pd.date_range(start=start_dt, end=cur_dt, normalize=True)[::-1]:
                     cur_file = name_pattern.replace('[date]', dt.strftime('%Y-%m-%d'))
                     if files.exists(cur_file):
-                        return load_file(data_file=data_file, load_func=load_func, **kwargs)
+                        return load_file(data_file=cur_file, load_func=load_func, **kwargs)
 
             # Retrieve data
             data = func(**all_kw)
