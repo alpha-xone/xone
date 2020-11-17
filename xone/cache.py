@@ -1,11 +1,9 @@
 import pandas as pd
 
-import os
 import sys
 import inspect
 
 from functools import wraps
-from parse import compile
 from xone import utils, files, logs
 
 LOAD_FUNC = {
@@ -28,6 +26,16 @@ SAVE_FUNC = {
 def with_cache(*dec_args, **dec_kwargs):
     """
     Wraps function to load cache data if available
+
+    Args:
+        data_path: root data path for caching.
+                   for functions in module, default will be the DATA_PATH defined in the module
+        file_fmt: file format (can include subfolder as well)
+        update_freq: update frequency, e.g., 1M, 1Q, etc.
+        load_func: custom function to load data (has to use `data_file` as argument)
+        save_func: custom function to save data (has to use `data` and `date_file` as argument)
+        file_func: custom function to generate file format:
+                   data will be saved to f'{root_path}/{file_func(**kwargs)}'
     """
     # Data root path
     data_root = dec_kwargs.get('data_path', None)
@@ -57,18 +65,25 @@ def with_cache(*dec_args, **dec_kwargs):
             kwargs.update(all_kw)
 
             # Data path and file name
-            cur_dt = utils.cur_time(tz=kwargs.get('tz', 'UTC'))
-            root_path = getattr(sys.modules[func.__module__], 'DATA_PATH') \
-                if not data_root else data_root
-            file_name = target_file_name(fmt=file_fmt, **all_kw) \
-                if file_fmt else f'{func.__name__}/[date].pkl'
+            cur_dt = utils.cur_time(tz=kwargs.get('_tz_', utils.DEFAULT_TZ))
+            if data_root:
+                root_path = data_root
+            else:
+                root_path = getattr(sys.modules[func.__module__], 'DATA_PATH')
+            if file_fmt:
+                file_name = target_file_name(fmt=file_fmt, **all_kw)
+            else:
+                file_name = f'{func.__name__}/[date].pkl'
 
             if callable(file_func):
                 name_pattern = ''
                 data_file = f'{root_path}/{file_func(**kwargs)}'
             else:
-                name_pattern = f'{root_path}/{file_name}'.replace('\\', '/')
-                data_file = name_pattern.replace('[today]', cur_dt).replace('[date]', cur_dt)
+                name_pattern = (
+                    f'{root_path}/{file_name}'.replace('\\', '/')
+                    .replace('[today]', '[date]')
+                )
+                data_file = name_pattern.replace('[today]', cur_dt)
 
             # Reload data and override cache if necessary
             use_cache = not kwargs.get('_reload_', False)
@@ -78,26 +93,12 @@ def with_cache(*dec_args, **dec_kwargs):
                 return load_file(data_file=data_file, load_func=load_func, **kwargs)
 
             # Load data if it was updated within update frequency
-            if update_freq and use_cache:
-                pattern = compile(
-                    name_pattern
-                    .replace('[today]', '[date]')
-                    .replace('[', '{')
-                    .replace(']', '}')
-                )
-                cache_files = sorted(
-                    filter(
-                        pattern.parse,
-                        files.all_files('/'.join(data_file.split('/')[:-1]))
-                    ),
-                    key=os.path.getmtime,
-                    reverse=True,
-                )
-                if len(cache_files) > 0:
-                    latest = cache_files[0]
-                    if pd.Timestamp('now') - files.file_modified_time(latest) < \
-                            pd.Timedelta(update_freq):
-                        return load_file(data_file=latest, **kwargs)
+            if update_freq and use_cache and ('[date]' in name_pattern):
+                start_dt = pd.date_range(end=cur_dt, freq=update_freq, periods=2)[0]
+                for dt in pd.date_range(start=start_dt, end=cur_dt, normalize=True)[::-1]:
+                    cur_file = name_pattern.replace('[date]', dt.strftime('%Y-%m-%d'))
+                    if files.exists(cur_file):
+                        return load_file(data_file=data_file, load_func=load_func, **kwargs)
 
             # Retrieve data
             data = func(**all_kw)
