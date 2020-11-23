@@ -133,7 +133,7 @@ In[21]: sample.to_parquet(data_file)
 |                |                                                                                                                                                 |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | Docs           | [![Documentation Status](https://readthedocs.org/projects/xone/badge/?version=latest)](https://xone.readthedocs.io/en/latest)                   |
-| Build          | [![Travis CI](https://img.shields.io/travis/alpha-xone/xone/master.svg?label=Travis%20CI)](https://travis-ci.com/alpha-xone/xone)               |
+| Build          | [![Actions Status](https://github.com/alpha-xone/xone/workflows/Auto%20CI/badge.svg)](https://github.com/alpha-xone/xone/actions)               |
 | Coverage       | [![codecov](https://codecov.io/gh/alpha-xone/xone/branch/master/graph/badge.svg)](https://codecov.io/gh/alpha-xone/xone)                        |
 | Quality        | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/eb3d11949a1343d9aa4806a31f3fcc41)](https://www.codacy.com/app/alpha-xone/xone)      |
 |                | [![CodeFactor](https://www.codefactor.io/repository/github/alpha-xone/xone/badge)](https://www.codefactor.io/repository/github/alpha-xone/xone) |
