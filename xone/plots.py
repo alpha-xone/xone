@@ -249,11 +249,21 @@ def xticks(data: (pd.Series, pd.DataFrame), max_cnt=8) -> pd.DataFrame:
         .fillna(pd.Timedelta('10 days'))
     )
     qtile = idx.quantile(q=.9)
-    dates = idx[idx > qtile].index
+    dates = (
+        idx[idx > qtile]
+        .index
+        .to_series()
+        .dt.date
+        .drop_duplicates(keep='last')
+        .index
+    )
     steps = int(dates.size / max_cnt) + 1
     res = dates[::-1][::steps][::-1]
-    if dates[0] not in res: res = res.insert(0, dates[0])
+    if res.size == 0:
+        return pd.DataFrame({'ticks': [], 'labels': []})
 
+    if (dates[0] not in res) and (res[0] not in dates[:2]):
+        res = res.insert(0, dates[0])
     return pd.DataFrame(
         data={
             'ticks': res.to_series().apply(data.index.get_loc),
@@ -275,8 +285,8 @@ def intraday(data: (pd.Series, pd.DataFrame), max_cnt=8, **kwargs):
     xrng = int(data.shape[0] * .01)
     ax.set_xlim(xmin=-xrng, xmax=data.shape[0] + xrng)
     ax.set_ylim(
-        ymin=data.values.min() * .97,
-        ymax=data.values.max() * 1.03,
+        ymin=data.values.min() * .98,
+        ymax=data.values.max() * 1.02,
     )
     ax.grid(which='major', axis='both', linestyle='--')
     plt.xticks(
