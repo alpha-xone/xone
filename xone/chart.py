@@ -283,11 +283,10 @@ def intraday(data: (pd.Series, pd.DataFrame), max_cnt=8, **kwargs):
     """
     ax = data.reset_index(drop=True).plot(**kwargs)
     xrng = int(data.shape[0] * .01)
+    yrng = data.values.min(), data.values.max()
+    ydiff = (yrng[1] - yrng[0]) * .05
     ax.set_xlim(xmin=-xrng, xmax=data.shape[0] + xrng)
-    ax.set_ylim(
-        ymin=data.values.min() * .98,
-        ymax=data.values.max() * 1.02,
-    )
+    ax.set_ylim(ymin=yrng[0] - ydiff, ymax=yrng[1] + ydiff)
     ax.grid(which='major', axis='both', linestyle='--')
     plt.xticks(
         rotation=30,

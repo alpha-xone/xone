@@ -7,7 +7,7 @@ __submodules__ = [
     'calendar',
     'files',
     'procs',
-    'plots',
+    'chart',
     'xql',
     'browser',
 ]
