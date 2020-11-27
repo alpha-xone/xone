@@ -1,5 +1,6 @@
 ignore:
   - xone/chart.py
+  - xone/browser.py
   - xone/procs.py
   - xone/cache.py
   - xone/profile.py
