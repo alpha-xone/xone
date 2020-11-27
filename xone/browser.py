@@ -35,6 +35,16 @@ def to_text(soup, elem_name, func: callable = None) -> list:
     ]
 
 
+def get_browser(browser, headless=True):
+    """
+    Get browser
+    """
+    br, br_opt = BROWSERS[browser]
+    if headless: br_opt.add_argument('--headless')
+    br_opt.add_argument('--disable-gpu')
+    return br(options=br_opt)
+
+
 def page_source(
         url: str,
         browser: str = '',
@@ -74,10 +84,7 @@ def page_source(
             f'Valid browsers: {list(BROWSERS.keys())}.'
         )
 
-    br, br_opt = BROWSERS[browser]
-    if headless: br_opt.add_argument('--headless')
-    br_opt.add_argument('--disable-gpu')
-    with br(options=br_opt) as driver:
+    with get_browser(browser, headless=True) as driver:
         driver.get(url=url)
         if click:
             try:
