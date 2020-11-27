@@ -243,10 +243,10 @@ def xticks(data: (pd.Series, pd.DataFrame), max_cnt=8) -> pd.DataFrame:
     to_plot = data.sort_index()
     idx = (
         to_plot.index
-            .to_series()
-            .diff()
-            .shift(-1)
-            .fillna(pd.Timedelta('10 days'))
+        .to_series()
+        .diff()
+        .shift(-1)
+        .fillna(pd.Timedelta('10 days'))
     )
     qtile = idx.quantile(q=.9)
     dates = idx[idx > qtile].index
