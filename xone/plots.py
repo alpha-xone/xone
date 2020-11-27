@@ -92,14 +92,6 @@ def plot_multi(data, cols=None, spacing=.06, color_map=None, plot_kw=None, **kwa
 
     Returns:
         ax for plot
-
-    Examples:
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>>
-        >>> idx = range(5)
-        >>> data = pd.DataFrame(dict(a=np.exp(idx), b=idx), index=idx)
-        >>> # plot_multi(data=data, cols=['a', 'b'], plot_kw=[dict(style='.-'), dict()])
     """
     from pandas import plotting
 
@@ -180,14 +172,6 @@ def plot_h(data, cols, wspace=.1, plot_kw=None, **kwargs):
 
     Returns:
         axes for plots
-
-    Examples:
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>>
-        >>> idx = range(5)
-        >>> data = pd.DataFrame(dict(a=np.exp(idx), b=idx), index=idx)
-        >>> # plot_h(data=data, cols=['a', 'b'], wspace=.2, plot_kw=[dict(style='.-'), dict()])
     """
     if plot_kw is None: plot_kw = [dict()] * len(cols)
 
@@ -243,3 +227,62 @@ def add_lines(
         axes.set_xlim(xmin=xlim[0], xmax=xlim[1])
 
     return axes
+
+
+def xticks(data: (pd.Series, pd.DataFrame), max_cnt=8) -> pd.DataFrame:
+    """
+    Get x-ticks for intraday data
+
+    Args:
+        data: intraday time series data
+        max_cnt: max number of intervals
+
+    Returns:
+        pd.DataFrame
+    """
+    to_plot = data.sort_index()
+    idx = (
+        to_plot.index
+            .to_series()
+            .diff()
+            .shift(-1)
+            .fillna(pd.Timedelta('10 days'))
+    )
+    qtile = idx.quantile(q=.9)
+    dates = idx[idx > qtile].index
+    steps = int(dates.size / max_cnt) + 1
+    res = dates[::-1][::steps][::-1]
+    if dates[0] not in res: res = res.insert(0, dates[0])
+
+    return pd.DataFrame(
+        data={
+            'ticks': res.to_series().apply(data.index.get_loc),
+            'labels': res.strftime('%Y-%m-%d'),
+        },
+        index=res,
+    )
+
+
+def intraday(data: (pd.Series, pd.DataFrame), max_cnt=8, **kwargs):
+    """
+    Plot intraday data
+
+    Args:
+        data: intraday time series data
+        max_cnt: max number of intervals
+    """
+    ax = data.reset_index(drop=True).plot(**kwargs)
+    xrng = int(data.shape[0] * .01)
+    ax.set_xlim(xmin=-xrng, xmax=data.shape[0] + xrng)
+    ax.set_ylim(
+        ymin=data.values.min() * .97,
+        ymax=data.values.max() * 1.03,
+    )
+    ax.grid(which='major', axis='both', linestyle='--')
+    plt.xticks(
+        rotation=30,
+        ha='right',
+        rotation_mode='anchor',
+        **xticks(data=data, max_cnt=max_cnt).to_dict('list'),
+    )
+    return ax
