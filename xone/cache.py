@@ -65,7 +65,10 @@ def with_cache(*dec_args, **dec_kwargs):
             kwargs.update(all_kw)
 
             # Data path and file name
-            cur_dt = utils.cur_time(tz=kwargs.get('_tz_', utils.DEFAULT_TZ))
+            cur_dt = utils.cur_time(
+                trading=False,
+                tz=kwargs.get('_tz_', utils.DEFAULT_TZ),
+            )
             if data_root:
                 root_path = data_root
             else:
