@@ -262,12 +262,18 @@ def flatten(iterable, maps=None, unique=False):
 def _to_gen_(iterable):
     """
     Recursively iterate lists and tuples
+
+    Examples:
+        >>> list(_to_gen_(['ab', 'cd', ['xy', 'zz']]))
+        ['ab', 'cd', 'xy', 'zz']
+        >>> list(_to_gen_(['ab', ['xy', 'zz']]))
+        ['ab', 'xy', 'zz']
     """
     from collections.abc import Iterable
 
     for elm in iterable:
         if isinstance(elm, Iterable) and not isinstance(elm, (str, bytes)):
-            yield from flatten(elm)
+            yield from _to_gen_(elm)
         else: yield elm
 
 
