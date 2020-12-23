@@ -98,7 +98,7 @@ def with_cache(*dec_args, **dec_kwargs):
             # Load data if it was updated within update frequency
             if update_freq and use_cache and ('[date]' in name_pattern):
                 start_dt = pd.date_range(end=cur_dt, freq=update_freq, periods=2)[0]
-                for dt in pd.date_range(start=start_dt, end=cur_dt, normalize=True)[::-1]:
+                for dt in pd.date_range(start=start_dt, end=cur_dt, normalize=True)[1:][::-1]:
                     cur_file = name_pattern.replace('[date]', dt.strftime('%Y-%m-%d'))
                     if files.exists(cur_file):
                         return load_file(data_file=cur_file, load_func=load_func, **kwargs)
