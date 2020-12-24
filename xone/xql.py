@@ -215,7 +215,7 @@ def select(table: str, cond='', **kwargs) -> str:
         for key, value in kwargs.items()
     ]
     where = ' AND '.join(filter(bool, all_cond))
-    s = f'SELECT * FROM {table}'
+    s = f'SELECT * FROM `{table}`'
     if where:
         return f"""
             {s}
