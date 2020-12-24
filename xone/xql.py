@@ -40,6 +40,15 @@ class SQLite(metaclass=Singleton):
         >>> db_.select(table='xone')
            rowid
         0      1
+        >>> db_.replace_into(
+        ...     table='xone',
+        ...     data=pd.DataFrame([{'rowid': 2}, {'rowid': 3}])
+        ... )
+        >>> db_.select(table='xone')
+           rowid
+        0      1
+        1      2
+        2      3
     """
 
     def __init__(self, db_file, keep_live=False):
