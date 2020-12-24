@@ -108,7 +108,7 @@ class SQLite(metaclass=Singleton):
         """
         return [
             info[1] for info in (
-                self.con.execute(f'PRAGMA table_info({table})').fetchall()
+                self.con.execute(f'PRAGMA table_info (`{table}`)').fetchall()
             )
         ]
 
@@ -123,10 +123,12 @@ class SQLite(metaclass=Singleton):
         """
         if isinstance(data, pd.DataFrame):
             keep_live = self.is_live
+            cols = ', '.join(map(lambda v: f'`{v}`', data.columns))
+            vals = ', '.join(['?'] * data.shape[1])
             # noinspection PyTypeChecker
-            data.apply(
-                lambda row: self.replace_into(table=table, _live_=True, **row),
-                axis=1
+            self.con.executemany(
+                f'REPLACE INTO `{table}` ({cols}) values ({vals})',
+                data.apply(tuple, axis=1).tolist()
             )
         else:
             keep_live = self.is_live or kwargs.get('_live_', False)
@@ -174,7 +176,7 @@ def db_value(val) -> str:
     """
     if isinstance(val, str):
         return json.dumps(val.replace('\"', '').strip())
-    return json.dumps(val)
+    return json.dumps(val, default=str)
 
 
 def select(table: str, cond='', **kwargs) -> str:
@@ -226,11 +228,11 @@ def replace_into(table: str, **kwargs) -> str:
     Examples:
         >>> query = replace_into('daily', ticker='ES1 Index', price=3000)
         >>> query.splitlines()[1].strip()
-        'REPLACE INTO daily (ticker, price)'
+        'REPLACE INTO `daily` (ticker, price)'
         >>> query.splitlines()[2].strip()
         'VALUES ("ES1 Index", 3000)'
     """
     return f"""
-        REPLACE INTO {table} ({', '.join(list(kwargs.keys()))})
+        REPLACE INTO `{table}` ({', '.join(list(kwargs.keys()))})
         VALUES ({', '.join(map(db_value, list(kwargs.values())))})
     """
