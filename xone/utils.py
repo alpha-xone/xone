@@ -7,9 +7,17 @@ import pytz
 import inspect
 import sys
 
+from typing import Union
 from xone import __version__
 
-__all__ = ['__version__']
+__all__ = [
+    '__version__',
+    'tolist',
+    'fmt_dt',
+    'trade_day',
+    'cur_time',
+    'align_data',
+]
 
 DEFAULT_TZ = pytz.FixedOffset(-time.timezone / 60)
 
@@ -414,7 +422,7 @@ def func_kwarg(func, **kwargs) -> dict:
     return {k: v for k, v in kwargs.items() if k in kind}
 
 
-def perf(data: (pd.DataFrame, pd.Series)) -> (pd.DataFrame, pd.Series):
+def perf(data: Union[pd.DataFrame, pd.Series]) -> Union[pd.DataFrame, pd.Series]:
     """
     Price performance based at 100
 
