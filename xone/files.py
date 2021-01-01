@@ -214,8 +214,3 @@ def file_modified_time(file_name):
     import pandas as pd
 
     return pd.Timestamp(pd.to_datetime(time.ctime(os.path.getmtime(file_name))))
-
-
-if __name__ == '__main__':
-
-    print(abspath(__file__) / 'tests/files')
