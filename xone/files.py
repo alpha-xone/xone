@@ -75,9 +75,9 @@ def all_files(
 
     Examples:
         >>> test_folder = abspath(__file__) / 'tests/files'
-        >>> all_files(test_folder, keyword='test', full_path=False)
+        >>> sorted(all_files(test_folder, keyword='test', full_path=False))
         ['test_1.json', 'test_2.json']
-        >>> all_files(test_folder, has_date=True, full_path=False)
+        >>> sorted(all_files(test_folder, has_date=True, full_path=False))
         ['dates_2019-01-01.yml', 'dates_2019-01-02.yml']
     """
     p = Path(path_name)
@@ -181,6 +181,7 @@ def latest_file(path_name, keyword='', ext='', **kwargs) -> str:
 
     Examples:
         >>> target_folder = abspath(__file__) / 'tests/folders'
+        >>> _ = target_folder.joinpath('test_2.yml').write_text('modified: 1')
         >>> latest_file(target_folder, keyword='test', ext='yml').split('/')[-1]
         'test_2.yml'
         >>> latest_file(target_folder / 'notfound')
