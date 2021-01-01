@@ -1,12 +1,16 @@
 import pandas as pd
 
+from typing import Union
 from xone import utils
 from matplotlib import pyplot as plt
 
 
 def plot_ts(
-        data: (pd.Series, pd.DataFrame), fld='close',
-        tz=None, vline=None, **kwargs
+        data: Union[pd.Series, pd.DataFrame],
+        fld='close',
+        tz=None,
+        vline=None,
+        **kwargs,
 ):
     """
     Time series data plots
@@ -229,7 +233,7 @@ def add_lines(
     return axes
 
 
-def xticks(data: (pd.Series, pd.DataFrame), max_cnt=8) -> pd.DataFrame:
+def xticks(data: Union[pd.Series, pd.DataFrame], max_cnt=8) -> pd.DataFrame:
     """
     Get x-ticks for intraday data
 
@@ -273,7 +277,7 @@ def xticks(data: (pd.Series, pd.DataFrame), max_cnt=8) -> pd.DataFrame:
     )
 
 
-def intraday(data: (pd.Series, pd.DataFrame), max_cnt=8, **kwargs):
+def intraday(data: Union[pd.Series, pd.DataFrame], max_cnt=8, **kwargs):
     """
     Plot intraday data
 
