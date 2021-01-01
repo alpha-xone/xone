@@ -208,7 +208,7 @@ def select(table: str, cond='', **kwargs) -> str:
         >>> q3.splitlines()[-2].strip()
         'price > 3000'
         >>> select('daily')
-        'SELECT * FROM daily'
+        'SELECT * FROM `daily`'
     """
     all_cond = [cond] + [
         f'{key}={db_value(value)}'
