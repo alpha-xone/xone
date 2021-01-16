@@ -1,6 +1,8 @@
 import os
 import time
+import parse
 
+from typing import List
 from pathlib import Path
 
 # Default datetime format:
@@ -38,7 +40,7 @@ def abspath(cur_file, parent=0) -> Path:
     """
     p = Path(cur_file)
     cur_path = p.parent if p.is_file() else p
-    if parent == 0: return cur_path
+    if parent == 0: return str(cur_path).replace('\\', '/')
     return abspath(cur_file=cur_path.parent, parent=parent - 1)
 
 
@@ -56,8 +58,8 @@ def create_folder(path_name: str, is_file=False):
 
 def all_files(
         path_name, keyword='', ext='', full_path=True,
-        has_date=False, date_fmt=DATE_FMT
-) -> list:
+        has_date=False, date_fmt=DATE_FMT,
+) -> List(str):
     """
     Search all files with criteria
     Returned list will be sorted by last modified
@@ -85,15 +87,17 @@ def all_files(
 
     keyword = f'*{keyword}*' if keyword else '*'
     keyword += f'.{ext}' if ext else '.*'
-    files = list(filter(lambda v: v.name[0] != '~', p.glob(keyword)))
-
-    if has_date: files = filter_by_dates(files, date_fmt=date_fmt)
-    return files if full_path else [f.name for f in files]
+    dt = parse.compile(date_fmt)
+    return [
+        str(f).replace('\\', '/') if full_path else f.name
+        for f in p.glob(keyword)
+        if f.is_file() and (f.name[0] != '~') and ((not has_date) or dt.search(f.name))
+    ]
 
 
 def all_folders(
         path_name, keyword='', has_date=False, date_fmt=DATE_FMT
-) -> list:
+) -> List[str]:
     """
     Search all folders with criteria
     Returned list will be sorted by last modified
@@ -122,13 +126,12 @@ def all_folders(
     p = Path(path_name)
     if not p.is_dir(): return []
 
-    folders = list(filter(
-        lambda v: v.is_dir() and v.name[0] != '~',
-        p.glob(f'*{keyword}*' if keyword else '*'),
-    ))
-
-    if has_date: folders = filter_by_dates(folders, date_fmt=date_fmt)
-    return folders
+    dt = parse.compile(date_fmt)
+    return [
+        str(f).replace('\\', '/')
+        for f in p.glob(f'*{keyword}*' if keyword else '*')
+        if f.is_dir() and (f.name[0] != '~') and ((not has_date) or dt.search(f.name))
+    ]
 
 
 def sort_by_modified(files_or_folders: list) -> list:
@@ -161,9 +164,7 @@ def filter_by_dates(files_or_folders: list, date_fmt=DATE_FMT) -> list:
         ... ])
         ['t1/dts_2019-01-01', 't2/dts_2019-01-02']
     """
-    from parse import compile
-
-    p = compile(date_fmt)
+    p = parse.compile(date_fmt)
     return list(filter(lambda _: p.search(Path(_).name), files_or_folders))
 
 

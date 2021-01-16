@@ -1,11 +1,10 @@
--i https://pypi.org/simple
-matplotlib>=3.0.2
-numpy>=1.15.0
-pandas>=1.0.0
-pyarrow>=1.0.0
-pytz>=2018.7
-parse>=1.18.0
-tqdm>=4.51.0
-beautifulsoup4>=4.9.0
-selenium>=3.141.0
-requests>=2.25.0
+matplotlib >= 3.0.2
+numpy >= 1.15.0
+pandas >= 1.2.0
+pyarrow >= 1.0.1
+pytz >= 2020.4
+parse >= 1.18.0
+tqdm >= 4.51.0
+beautifulsoup4 >= 4.9.0
+selenium >= 3.141.0
+requests >= 2.25.0
