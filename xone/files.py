@@ -59,7 +59,7 @@ def create_folder(path_name: str, is_file=False):
 def all_files(
         path_name, keyword='', ext='', full_path=True,
         has_date=False, date_fmt=DATE_FMT,
-) -> List(str):
+) -> List[str]:
     """
     Search all files with criteria
     Returned list will be sorted by last modified
@@ -114,11 +114,11 @@ def all_folders(
     Examples:
         >>> target_folder = abspath(__file__) / 'tests/folders'
         >>> for fld in sorted(all_folders(target_folder, keyword='test')):
-        ...     print(fld.name)
+        ...     print(fld.split('/')[-1])
         test_1
         test_2
         >>> for fld in sorted(all_folders(target_folder, has_date=True)):
-        ...     print(fld.name)
+        ...     print(fld.split('/')[-1])
         dates_2019-01-01
         dates_2019-01-02_labeled
         dates_2019-01-03
