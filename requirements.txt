@@ -1,6 +1,6 @@
 matplotlib >= 3.0.2
 numpy >= 1.15.0
-pandas >= 1.2.0
+pandas >= 1.0.0
 pyarrow >= 1.0.1
 pytz >= 2020.4
 parse >= 1.18.0
