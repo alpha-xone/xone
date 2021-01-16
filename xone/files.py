@@ -76,7 +76,7 @@ def all_files(
         list: all file names with criteria fulfilled
 
     Examples:
-        >>> test_folder = abspath(__file__) / 'tests/files'
+        >>> test_folder = Path(abspath(__file__)) / 'tests/files'
         >>> sorted(all_files(test_folder, keyword='test', full_path=False))
         ['test_1.json', 'test_2.json']
         >>> sorted(all_files(test_folder, has_date=True, full_path=False))
@@ -112,7 +112,7 @@ def all_folders(
         list: all folder names fulfilled criteria
 
     Examples:
-        >>> target_folder = abspath(__file__) / 'tests/folders'
+        >>> target_folder = Path(abspath(__file__)) / 'tests/folders'
         >>> for fld in sorted(all_folders(target_folder, keyword='test')):
         ...     print(fld.split('/')[-1])
         test_1
@@ -181,7 +181,7 @@ def latest_file(path_name, keyword='', ext='', **kwargs) -> str:
         str: latest file name
 
     Examples:
-        >>> target_folder = abspath(__file__) / 'tests/folders'
+        >>> target_folder = Path(abspath(__file__)) / 'tests/folders'
         >>> _ = target_folder.joinpath('test_2.yml').write_text('modified: 1')
         >>> latest_file(target_folder, keyword='test', ext='yml').split('/')[-1]
         'test_2.yml'
