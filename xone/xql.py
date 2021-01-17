@@ -31,8 +31,8 @@ class SQLite(metaclass=Singleton):
         >>>
         >>> db_file_ = f'{files.abspath(__file__)}/tests/xone.db'
         >>> with SQLite(db_file_) as con_:
-        ...     _ = con_.execute('DROP TABLE IF EXISTS xone')
-        ...     _ = con_.execute('CREATE TABLE xone (rowid int)')
+        ...     _ = con_.con.execute('DROP TABLE IF EXISTS xone')
+        ...     _ = con_.con.execute('CREATE TABLE xone (rowid int)')
         >>> db_ = SQLite(db_file_)
         >>> db_.tables()
         ['xone']
@@ -173,7 +173,7 @@ class SQLite(metaclass=Singleton):
             print(e)
 
     def __enter__(self):
-        return self.con.cursor()
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close(keep_live=self.keep_live)
