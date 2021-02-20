@@ -97,7 +97,7 @@ def plot_multi(data, cols=None, spacing=.06, color_map=None, plot_kw=None, **kwa
     Returns:
         ax for plot
     """
-    from pandas import plotting
+    from pandas.plotting._matplotlib.style import get_standard_colors
 
     if cols is None: cols = data.columns
     if plot_kw is None: plot_kw = [{}] * len(cols)
@@ -105,11 +105,7 @@ def plot_multi(data, cols=None, spacing=.06, color_map=None, plot_kw=None, **kwa
     num_colors = len(utils.flatten(cols))
 
     # Get default color style from pandas
-    if hasattr(plotting, '_matplotlib'):
-        style = getattr(plotting, '_matplotlib').style
-    else:
-        style = getattr(plotting, '_style')
-    colors = getattr(style, '_get_standard_colors')(num_colors=num_colors)
+    colors = get_standard_colors(num_colors=num_colors)
     if color_map is None: color_map = dict()
 
     fig = plt.figure()
