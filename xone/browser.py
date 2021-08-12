@@ -1,7 +1,9 @@
 import requests
 import time
+import os
+import shutil
 
-from xone import logs
+from xone import logs, files
 from collections import namedtuple
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -35,13 +37,40 @@ def to_text(soup, elem_name, func: callable = None) -> list:
     ]
 
 
-def get_browser(browser, headless=True, *args):
+def get_rel_path(folder: str, home=os.path.expanduser('~')) -> str:
+    """
+    Get relative path from home folder
+    """
+    return (
+        f'{home}/{folder}'
+        .replace('/', os.path.sep)
+        .replace('\\', os.path.sep)
+    )
+
+
+def get_browser(browser, headless=True, download='', *args):
     """
     Get browser
+
+    Args:
+        browser: one of firefox and chrome
+        headless: whether to show browser
+        download: folder to download files to - relative to ~/Downloads
+                  files in the folder WILL BE REMOVED when browser is returned
     """
     br, br_opt = BROWSERS[browser]
     if headless: br_opt.add_argument('--headless')
     br_opt.add_argument('--disable-gpu')
+    br_opt.add_experimental_option('excludeSwitches', ['enable-logging'])
+    if download:
+        dl_path = get_rel_path(folder=f'Downloads/{download}')
+        if files.exists(dl_path): shutil.rmtree(dl_path, ignore_errors=True)
+        files.create_folder(dl_path)
+        br_opt.add_experimental_option('prefs', {
+            'download.default_directory': dl_path,
+            'download.prompt_for_download': False,
+            'download.directory_upgrade': True,
+        })
     for arg in args: br_opt.add_argument(arg)
     return br(options=br_opt)
 
