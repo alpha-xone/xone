@@ -1,3 +1,5 @@
+import pandas as pd
+
 import requests
 import time
 import os
@@ -127,3 +129,20 @@ def page_source(
             source=driver.page_source,
             soup=BeautifulSoup(driver.page_source, 'lxml'),
         )
+
+
+def read_html(
+        soup: BeautifulSoup,
+        tag: str,
+        attrs: dict,
+        cols: list,
+        **kwargs
+) -> pd.DataFrame:
+    """
+    Read table from soup instead of the whole web page
+    """
+    table = soup.find_all(tag, attrs=attrs)
+    if not table: return pd.DataFrame()
+    tb = pd.read_html(table[0].prettify(), **kwargs)
+    if not tb: return pd.DataFrame()
+    return tb[0].rename(columns=dict(zip(range(len(cols)), cols)))
